@@ -27,7 +27,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <header className="p-4 bg-[#111] shadow sticky top-0 border-b border-b-white shadow-gray-100">
+          <h1 className="text-3xl font-bold">BloX</h1>
+        </header>
+        <main className="max-w-7xl mx-auto p-4 ">
+         {children}
+        </main>
       </body>
     </html>
   );
