@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.signupBg{
+  background-color: rgba(0, 0, 0, 0.616);
+  background: url('https://i.pinimg.com/1200x/d6/5b/e2/d65be2b3f8cc389514fa5ec532290709.jpg');
+  background-size: cover;
+  background-position: left center;
+}
