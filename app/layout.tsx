@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Link from "next/link";
+import Header from "@/components/Header";
+import ClientLayout from "@/components/ClientLayout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,14 +29,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="p-4 bg-[#111] shadow sticky top-0 border-b border-b-white shadow-gray-100">
-          <Link href={'/'}>
-          <h1 className="text-3xl font-bold">BloX</h1>
-          </Link>
-        </header>
-        <main className=" p-4 ">
-         {children}
-        </main>
+        <ClientLayout>
+          <Header />
+          <main className=" p-4 ">
+          {children}
+          </main>
+        </ClientLayout>
       </body>
     </html>
   );

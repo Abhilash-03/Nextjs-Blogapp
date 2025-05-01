@@ -18,7 +18,7 @@ const SignInPage = () => {
         })
 
         if(res?.ok) {
-            router.push('/dashboard');
+            router.push('/dashboard/profile');
         } else {
             setError('Invalid credentails');
         }
@@ -54,7 +54,7 @@ const SignInPage = () => {
     <hr />
 
         <button
-        onClick={() => signIn('google', {callbackUrl: '/dashboard'})}
+        onClick={() => signIn('google', {callbackUrl: '/dashboard/profile'})}
         className="bg-gray-200 text-black w-full py-2 rounded-xl hover:bg-slate-300 mt-5 cursor-pointer"
       >
         Sign in with Google
