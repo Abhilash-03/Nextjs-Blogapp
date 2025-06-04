@@ -8,7 +8,7 @@ export default async function Home() {
   return (
     <div className="text-center mt-10 flex flex-row-reverse w-full justify-between items-center">
     <div className="w-2/4">
-      <Image src={'https://i.pinimg.com/736x/39/04/ca/3904cac800f334f51befce656d85b7e0.jpg'} alt="home-image" width={500} height={450} className="rounded-2xl" />
+      <Image src={'https://i.pinimg.com/736x/ad/83/3d/ad833d8017a0428397f28f41acfbc888.jpg'} alt="home-image" width={500} height={450} className="rounded-2xl" />
     </div>
     <div className="w-2/4">
      <h2 className="text-5xl font-bold text-slate-300 ">Welcome To My BloX!</h2>
