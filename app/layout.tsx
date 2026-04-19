@@ -25,13 +25,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ClientLayout>
           <Header />
-          <main className=" p-4 ">
+          <main className="h-full">
           {children}
           </main>
         </ClientLayout>

@@ -24,12 +24,12 @@ const CommentForm = ({ postId, parentCommentId = null, onSuccess }) => {
     <form onSubmit={handleSubmit} className='my-4'>
         <textarea value={text} onChange={(e) => setText(e.target.value)}
          placeholder='Write a comment...'
-         className='w-full placeholder:text-black text-background p-2 rounded-md border bg-white outline-none'
+         className='w-full placeholder:text-black p-2 rounded-md border bg-white dark:bg-gray-600/50 text-black dark:text-white outline-none'
          rows={2}   
          required 
          minLength={3}
         ></textarea>
-        <button type='submit' disabled={submitting || !text.trim()} className='mt-2 px-10 py-3 rounded-full bg-black text-gray-100  hover:opacity-80 cursor-pointer'>
+        <button type='submit' disabled={submitting || !text.trim()} className='mt-2 px-5 py-3 rounded-xl bg-black text-gray-100  hover:opacity-80 cursor-pointer dark:bg-white dark:text-black font-semibold'>
             {submitting ? 'Posting...' : 'Post'}
         </button>
     </form>

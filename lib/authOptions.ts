@@ -33,7 +33,7 @@ export const authOptions = {
         })
     ],
     callbacks: {
-        async signIn({ user, account, profile }) {
+        async signIn({ user, account }) {
            await connectToDB();
         //    console.log("Google Data", user);
         //    console.log("Account", account);
@@ -55,7 +55,7 @@ export const authOptions = {
         async session({ session }){
             await connectToDB();
             const dbUser = await User.findOne({ email: session.user.email});
-            session.user.id = dbUser._id;
+            session.user.id = dbUser._id?.toString();
             session.user.role = dbUser.role;
             return session;
         },
@@ -65,7 +65,7 @@ export const authOptions = {
         signIn: '/auth/signin',
     },
     session: {
-        strategy: 'jwt',
+        strategy: 'jwt' as const,
     },
     secret: process.env.NEXTAUTH_SECRET
 }

@@ -143,9 +143,9 @@ const BlogEditor = ({ editPost }) => {
         onBlur={() => setSlug(generateSlug(slug))}
         required
       />
-      <div className='mt-4 border border-white rounded-xl px-4 flex flex-col gap-2 py-3'>
+      <div className='mt-4 border rounded-xl px-4 flex flex-col gap-2 py-3'>
         <div className='flex'>
-          <label htmlFor='cover image' className="block">Cover Image:</label>
+          <label htmlFor='cover image' className="block me-2">Cover Image:</label>
           <input type="file" onChange={handleImageUpload} className='border-none' />
         </div>
         {uploading && <p>Uploading...</p>}
@@ -165,7 +165,7 @@ const BlogEditor = ({ editPost }) => {
 
       <button
         type='submit'
-        className='bg-white text-black px-4 py-2 rounded-xl mt-10 cursor-pointer'
+        className='dark:bg-white bg-black text-white dark:text-black px-4 py-2 rounded-xl mt-10 cursor-pointer'
       >
         {editPost ? 'Update Post' : 'Publish Post'}
       </button>

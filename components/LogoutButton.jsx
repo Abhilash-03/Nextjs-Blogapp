@@ -1,13 +1,19 @@
 'use client';
-import { signOut } from 'next-auth/react'
-import React from 'react'
+import { signOut } from 'next-auth/react';
+import { motion } from 'motion/react';
 
 const LogoutButton = () => {
   return (
-    <button type='button' onClick={() => signOut({callbackUrl: '/'})}  className="bg-gray-300 text-black px-4 py-2 rounded-full w-3/4 mx-auto cursor-pointer hover:bg-gray-800 hover:text-gray-200 transition-all duration-300 ease-linear px-5 py-3">
-       Logout
-    </button>
-  )
-}
+    <motion.button
+      type="button"
+      onClick={() => signOut({ callbackUrl: '/' })}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="w-full rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm font-semibold text-destructive transition hover:bg-destructive/20"
+    >
+      Logout
+    </motion.button>
+  );
+};
 
-export default LogoutButton
+export default LogoutButton;
