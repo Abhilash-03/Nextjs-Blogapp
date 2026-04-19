@@ -8,11 +8,11 @@ export const GET = async(req, {params})=> {
         const { slug } = await params;
         const singlePost = await Post.findOne({slug});
         console.log("Post", singlePost);
-        if(!singlePost) return NextResponse.json({ message: 'Post not found', status: 404});
+        if(!singlePost) return NextResponse.json({ message: 'Post not found' }, { status: 404 });
 
         return NextResponse.json(singlePost, {status: 200});
     } catch (error) {
         console.log("Error to fetch single post", error.message);
-        return NextResponse.json({ error: 'Post not fetched', status: 500});
+        return NextResponse.json({ error: 'Post not fetched' }, { status: 500 });
     }
 }

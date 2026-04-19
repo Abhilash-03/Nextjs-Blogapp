@@ -9,14 +9,14 @@ export const DELETE = async(req, {params}) => {
         const deletedPost = await Post.findByIdAndDelete(id);
         
         if(!deletedPost) {
-            return NextResponse.json({message: 'Post not found', status: 404});
+            return NextResponse.json({message: 'Post not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ message: "Post deleted successfully.", status: 200 });
+        return NextResponse.json({ message: "Post deleted successfully." }, { status: 200 });
 
     } catch (error) {
         console.log('API FOR DELETE POST ERROR: ', error);
-        return NextResponse.json({error: 'Failed to delete post', status: 500})
+        return NextResponse.json({error: 'Failed to delete post' }, { status: 500 })
     }
 }
 
@@ -33,13 +33,13 @@ export const PATCH = async(req, {params}) => {
             slug
         }, {new : true});
         if(!updatedPost) {
-            return NextResponse.json({ message: 'No post found', status: 404})
+            return NextResponse.json({ message: 'No post found' }, { status: 404 })
         }
 
-        return NextResponse.json({ message: 'Post has been updated successfully', status: 200});
+        return NextResponse.json({ message: 'Post has been updated successfully' }, { status: 200 });
         
     } catch (error) {
         console.log('Error updating post ', error);
-        return NextResponse.json({error: "Failed to update post", status: 500});
+        return NextResponse.json({error: "Failed to update post" }, { status: 500 });
     }
 }

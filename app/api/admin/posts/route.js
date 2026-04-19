@@ -10,6 +10,6 @@ export const GET = async() => {
         return NextResponse.json({ posts });
     } catch (error) {
         console.log("Error fetching admin Posts", error.message);
-        return NextResponse.json({ error: 'Failed to load posts', status: 500});
+        return NextResponse.json({ error: 'Failed to load posts' }, { status: 500 });
     }
 }

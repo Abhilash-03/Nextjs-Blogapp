@@ -10,6 +10,6 @@ export const GET = async() => {
         return Response.json({ users });
     } catch (error) {
         console.log("Admin Users Error", error.message);
-        return NextResponse.json({ error: 'Failed to fetch users', status: 500});
+        return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 });
     }
 }

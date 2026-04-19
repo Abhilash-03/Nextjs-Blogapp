@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
     const session = await getServerSession(authOptions);
 
-    if(!session) return NextResponse.json({ error: 'Unauthorized', status: 401});
+    if(!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const { title, content, image } = await req.json();
     const generateSlug = (value) => {
@@ -37,7 +37,7 @@ export async function POST(req) {
         return NextResponse.json(newPost, { status: 201 });
 
     } catch (error) {
-        return NextResponse.json({ error: error.message, status: 500})
+        return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
 }

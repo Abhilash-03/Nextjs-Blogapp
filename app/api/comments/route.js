@@ -46,7 +46,7 @@ export const GET = async(req) => {
         const { searchParams } = new URL(req.url);
         const postId = searchParams.get('postId');
 
-        if(!postId) return NextResponse.json({ message: 'Post ID required', status: 400});
+        if(!postId) return NextResponse.json({ message: 'Post ID required' }, { status: 400 });
 
         const comments = await Comment.find({ postId }).populate('userId', 'name email image').sort({ createdAt: -1 });
 
@@ -61,6 +61,6 @@ export const GET = async(req) => {
         return NextResponse.json(formatComments(comments), {status: 200})
 
     } catch (error) {
-        return NextResponse.json({ error: error.message, status: 500});
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

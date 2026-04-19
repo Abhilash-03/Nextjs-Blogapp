@@ -36,7 +36,7 @@ export const PATCH = async(req, { params }) => {
         }
 
         await comment.save();
-        return NextResponse.json({ message: 'Reaction updated', status: 200})
+        return NextResponse.json({ message: 'Reaction updated' }, { status: 200 })
     } catch (error) {
         return NextResponse.json({ error: 'Failed to update like/dislike '+ error.message }, {status: 500});
     }
