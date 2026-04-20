@@ -1,8 +1,13 @@
+'use client';
+
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const AdminPosts = () => {
     const [posts, setPosts] = useState([]);
+    const [deleteId, setDeleteId] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, postId: null, postTitle: '' });
     const router = useRouter();
 
     useEffect(() => {
@@ -16,16 +21,23 @@ const AdminPosts = () => {
     }, [])
 
     const handleDelete = async(id) => {
-       const confirm = window.confirm('Are you sure you want to delete this post?');
-       if(!confirm) return;
-
+       setDeleteId(id);
        const res = await fetch(`/api/posts/${id}`, { method: 'DELETE'});
 
        if(res.ok) {
         setPosts(posts.filter((post) => post._id !== id));
        }
-
+       setDeleteId(null);
+       setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
     }
+
+    const openDeleteModal = (postId, postTitle) => {
+      setConfirmModal({ isOpen: true, postId, postTitle });
+    };
+
+    const closeDeleteModal = () => {
+      setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
+    };
 
   return (
     <div className="p-4">
@@ -55,7 +67,7 @@ const AdminPosts = () => {
                 Edit
               </button>
               <button
-                onClick={() => handleDelete(post._id)}
+                onClick={() => openDeleteModal(post._id, post.title)}
                 className="bg-red-500 px-3 py-1 text-white rounded cursor-pointer"
               >
                 Delete
@@ -65,6 +77,19 @@ const AdminPosts = () => {
         ))}
       </tbody>
     </table>
+
+    {/* Delete Confirmation Modal */}
+    <ConfirmModal
+      isOpen={confirmModal.isOpen}
+      onClose={closeDeleteModal}
+      onConfirm={() => handleDelete(confirmModal.postId)}
+      title="Delete Post"
+      message={`Are you sure you want to delete "${confirmModal.postTitle}"? This action cannot be undone.`}
+      confirmText="Delete"
+      cancelText="Cancel"
+      variant="danger"
+      loading={deleteId === confirmModal.postId}
+    />
   </div>
   )
 }

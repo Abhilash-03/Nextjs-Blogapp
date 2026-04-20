@@ -1,5 +1,6 @@
 'use client';
 import AdminPosts from '@/components/admin/AdminPosts';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -48,6 +49,8 @@ const AdminPage = () => {
 
 function UsersTab() {
     const [users, setUsers] = useState([])
+    const [deleteId, setDeleteId] = useState(null)
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, userName: '' })
   
     useEffect(() => {
       const fetchUsers = async () => {
@@ -60,10 +63,20 @@ function UsersTab() {
     }, [])
   
     const handleDelete = async (id) => {
-      if (!confirm('Are you sure you want to delete this user?')) return
-     const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' })
-     const data = await res.json();
+      setDeleteId(id)
+      const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' })
+      const data = await res.json();
       setUsers(users.filter(user => user._id !== id))
+      setDeleteId(null)
+      setConfirmModal({ isOpen: false, userId: null, userName: '' })
+    }
+
+    const openDeleteModal = (userId, userName) => {
+      setConfirmModal({ isOpen: true, userId, userName })
+    }
+
+    const closeDeleteModal = () => {
+      setConfirmModal({ isOpen: false, userId: null, userName: '' })
     }
   
     return (
@@ -79,7 +92,7 @@ function UsersTab() {
                 user.role !== 'admin' && (
                     <button
                     className="mt-2 bg-gray-300 text-black py-3 px-6 rounded-full border border-black cursor-pointer hover:bg-black hover:text-gray-200"
-                    onClick={() => handleDelete(user._id)}
+                    onClick={() => openDeleteModal(user._id, user.name || user.email)}
                   >
                     Delete User
                   </button>
@@ -90,6 +103,19 @@ function UsersTab() {
 
           </div>
         ))}
+
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={closeDeleteModal}
+          onConfirm={() => handleDelete(confirmModal.userId)}
+          title="Delete User"
+          message={`Are you sure you want to delete "${confirmModal.userName}"? This will also delete all their posts and comments. This action cannot be undone.`}
+          confirmText="Delete User"
+          cancelText="Cancel"
+          variant="danger"
+          loading={deleteId === confirmModal.userId}
+        />
       </div>
     )
   }

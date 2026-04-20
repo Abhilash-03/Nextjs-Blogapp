@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 const UserAllPosts = () => {
   const { data: session, status } = useSession();
@@ -13,6 +14,7 @@ const UserAllPosts = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'title'
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, postId: null, postTitle: '' });
   const router = useRouter();
 
   useEffect(() => {
@@ -38,7 +40,16 @@ const UserAllPosts = () => {
       console.log("Delete Post Error ", error.message);
     } finally {
       setDeleteId(null);
+      setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
     }
+  };
+
+  const openDeleteModal = (postId, postTitle) => {
+    setConfirmModal({ isOpen: true, postId, postTitle });
+  };
+
+  const closeDeleteModal = () => {
+    setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
   };
 
   // Sort posts
@@ -283,11 +294,7 @@ const UserAllPosts = () => {
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => {
-                            if (confirm('Are you sure you want to delete this post?')) {
-                              handleDelete(post._id);
-                            }
-                          }}
+                          onClick={() => openDeleteModal(post._id, post.title)}
                           disabled={deleteId === post._id}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-destructive bg-destructive/10 hover:bg-destructive/20 transition-colors disabled:opacity-50"
                         >
@@ -384,11 +391,7 @@ const UserAllPosts = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => {
-                        if (confirm('Are you sure you want to delete this post?')) {
-                          handleDelete(post._id);
-                        }
-                      }}
+                      onClick={() => openDeleteModal(post._id, post.title)}
                       disabled={deleteId === post._id}
                       className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
                     >
@@ -407,6 +410,19 @@ const UserAllPosts = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={() => handleDelete(confirmModal.postId)}
+        title="Delete Post"
+        message={`Are you sure you want to delete "${confirmModal.postTitle}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        loading={deleteId === confirmModal.postId}
+      />
     </div>
   );
 };
