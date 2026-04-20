@@ -1,4 +1,3 @@
-import LogoutButton from '@/components/LogoutButton';
 import Sidebar from '@/components/Sidebar';
 import { authOptions } from '@/lib/authOptions';
 import { getServerSession } from 'next-auth';
@@ -11,11 +10,13 @@ const DashboardPage = async () => {
   if (!session) redirect('/auth/signin');
 
   return (
-    <div className="min-h-[88vh] px-4 pb-16 pt-12">
-      <div className="mx-auto flex max-w-7xl gap-8">
-        <Sidebar />
-        <div className="flex-1">
-          <ProfileCard session={session} />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex gap-8">
+          <Sidebar />
+          <div className="flex-1">
+            <ProfileCard session={session} />
+          </div>
         </div>
       </div>
     </div>
