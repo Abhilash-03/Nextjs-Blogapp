@@ -23,37 +23,69 @@ const BlogPage = async() => {
     }));
 
   return (
-    <div className="relative min-h-[88vh] overflow-hidden px-4 pb-16 pt-12">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(93,76,255,0.16),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(76,196,255,0.14),transparent_30%),radial-gradient(circle_at_50%_80%,rgba(255,158,76,0.12),transparent_28%)] pointer-events-none" />
-
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-10">
-        <div className="flex flex-col gap-4 rounded-3xl border border-border bg-card/70 p-6 shadow-xl backdrop-blur">
-          <div className="inline-flex items-center gap-2 self-start rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-semibold text-muted-foreground">
-            <span className="h-2 w-2 rounded-full bg-primary" />
-            Discover curated writing
-          </div>
-          <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">All blog posts</h1>
-            <p className="text-sm text-muted-foreground sm:text-base">
-              Fresh perspectives from the community—browse the latest stories, tutorials, and insights.
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary/5 via-background to-background">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.08),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(99,102,241,0.05),transparent_50%)]" />
+        
+        <div className="relative max-w-6xl mx-auto px-4 py-16 md:py-24">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-6">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+              Explore Articles
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground tracking-tight mb-4">
+              Discover Stories & Ideas
+            </h1>
+            <p className="text-lg text-muted-foreground max-w-2xl">
+              Fresh perspectives from our community—browse the latest stories, tutorials, and insights from writers around the world.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-            <span className="rounded-full border border-border bg-background px-3 py-1">Latest</span>
-            <span className="rounded-full border border-border bg-background px-3 py-1">Productivity</span>
-            <span className="rounded-full border border-border bg-background px-3 py-1">Design</span>
-            <span className="rounded-full border border-border bg-background px-3 py-1">Engineering</span>
+          
+          {/* Stats */}
+          <div className="flex flex-wrap gap-8 mt-10 pt-8 border-t border-border/50">
+            <div>
+              <p className="text-3xl font-bold text-foreground">{plainPosts.length}</p>
+              <p className="text-sm text-muted-foreground">Published articles</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-foreground">{new Set(plainPosts.map(p => p.author?._id)).size}</p>
+              <p className="text-sm text-muted-foreground">Contributing authors</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        {/* Filter bar (placeholder for future filtering) */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-foreground">Latest Posts</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Showing {plainPosts.length} articles</span>
           </div>
         </div>
 
         {plainPosts.length === 0 ? (
-          <div className="rounded-3xl border border-border bg-card/70 p-12 text-center shadow-lg backdrop-blur">
-            <p className="text-lg font-semibold">No posts yet</p>
-            <p className="mt-2 text-sm text-muted-foreground">Check back soon for new stories from the community.</p>
+          <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-dashed border-border bg-card/30">
+            <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-2xl bg-muted/50">
+              <svg className="w-8 h-8 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No articles yet</h3>
+            <p className="text-sm text-muted-foreground text-center max-w-sm">
+              Check back soon for new stories and insights from our community.
+            </p>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {plainPosts.map(post => (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {plainPosts.map((post, index) => (
               <BlogCard key={post._id} post={post} />
             ))}
           </div>

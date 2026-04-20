@@ -2,112 +2,107 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
-import { User } from "lucide-react";
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
 
+// Calculate reading time
+const getReadingTime = (content) => {
+  if (!content) return 1;
+  const text = content.replace?.(/<[^>]*>/g, '') || '';
+  const words = text.split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+};
+
 const BlogCard = ({ post }) => {
   const createdAt = new Date(post.createdAt);
+  const readingTime = getReadingTime(post.content);
+  
   function postAgeLabel(createdAtString) {
     const created = new Date(createdAtString);
     const now = new Date();
-  
     const diffMs = now.getTime() - created.getTime();
     const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   
-    if (days < 1) return 'New';
-    if (days === 1) return '1 day ago';
-    if (days < 30) return `${days} days ago`;
-  
-    // months/years
-    const months =
-      (now.getFullYear() - created.getFullYear()) * 12 +
-      (now.getMonth() - created.getMonth()) -
-      (now.getDate() < created.getDate() ? 1 : 0);
-  
-    if (months < 1) return 'Less than a month ago';
-    if (months === 1) return '1 month ago';
-    if (months < 12) return `${months} months ago`;
-  
-    const years = Math.floor(months / 12);
-    if (years === 1) return '1 year ago';
-    return `${years} years ago`;
+    if (days < 1) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 7) return `${days}d ago`;
+    if (days < 30) return `${Math.floor(days / 7)}w ago`;
+    if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+    return `${Math.floor(days / 365)}y ago`;
   }
 
-  const dateLabel = createdAt.toLocaleDateString('en-IN');
   const author = post?.author?.name || 'Unknown author';
+  const authorImage = post?.author?.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png';
   
   return (
     <Link href={`/blog/${post.slug}`} className="block h-full">
-      <motion.div
-        initial="rest"
-        animate="rest"
-        whileHover="hover"
-        whileTap={{ scale: 0.995 }}
-        transition={{ type: "spring", stiffness: 240, damping: 18 }}
-        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card/80 shadow-lg backdrop-blur"
-        variants={{
-          rest: { y: 0, scale: 1 },
-          hover: { y: -6, scale: 1.01 },
-        }}
+      <motion.article
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.3 }}
+        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card hover:border-primary/30 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300"
       >
-        <motion.div
-          className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-white/10 to-transparent"
-          variants={{
-            rest: { x: '-120%', opacity: 0 },
-            hover: {
-              x: '120%',
-              opacity: 0.55,
-              transition: { duration: 1.4, repeat: Infinity, repeatType: 'loop', ease: 'easeInOut' },
-            },
-          }}
-        />
-        <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-[radial-gradient(circle_at_30%_20%,rgba(93,76,255,0.16),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(76,196,255,0.16),transparent_35%)]" />
-
-        <div className="relative">
+        {/* Image Container */}
+        <div className="relative aspect-[16/10] overflow-hidden bg-muted">
           <img
             src={post?.image || fallbackImage}
             alt={post.title}
-            className="h-48 w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 via-black/30 to-transparent px-4 py-3 text-xs text-white">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 backdrop-blur">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
-              {dateLabel}
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          
+          {/* Reading time badge */}
+          <div className="absolute top-3 right-3">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background/90 backdrop-blur-sm text-xs font-medium text-foreground shadow-sm">
+              <svg className="w-3 h-3 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {readingTime} min
             </span>
-            <span className="text-[11px] uppercase tracking-[0.15em] text-white/80">Read</span>
           </div>
         </div>
 
-        <div className="relative flex flex-1 flex-col gap-3 px-4 py-4">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {post.author.image ? 
-             <img src={post?.author?.image || null} alt={author} className="h-8 w-8 rounded-full" /> :
-             <User className="w-6 h-6 rounded-full" />
-            }
-            <div className="leading-tight">
-              <p className="text-sm font-semibold text-foreground capitalize">{author}</p>
-              <p className="text-[12px] text-muted-foreground">Author</p>
+        {/* Content */}
+        <div className="flex flex-1 flex-col p-5">
+          {/* Meta info */}
+          <div className="flex items-center gap-3 mb-3">
+            <img 
+              src={authorImage} 
+              alt={author} 
+              className="h-8 w-8 rounded-full object-cover ring-2 ring-background" 
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-foreground truncate">{author}</p>
+              <p className="text-xs text-muted-foreground">{postAgeLabel(post.createdAt)}</p>
             </div>
           </div>
 
-          <h3 className="text-lg font-semibold leading-tight text-foreground group-hover:text-primary transition-colors">
+          {/* Title */}
+          <h3 className="text-lg font-bold leading-snug text-foreground group-hover:text-primary transition-colors mb-2 line-clamp-2">
             {post.title}
           </h3>
 
-          <p className="line-clamp-2 text-sm text-muted-foreground">
-            {post.description || "Dive into this story to learn more about design, product, and engineering craft."}
+          {/* Description */}
+          <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
+            {post.description || "Explore this article to discover new insights and perspectives..."}
           </p>
 
-          <div className="mt-auto flex items-center justify-between pt-2 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              {postAgeLabel(post.createdAt)}
+          {/* Footer */}
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+            <span className="text-xs text-muted-foreground">
+              {createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
-            <span className="transition text-primary group-hover:translate-x-1">Read more →</span>
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-primary group-hover:gap-2 transition-all">
+              Read article
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </span>
           </div>
         </div>
-      </motion.div>
+      </motion.article>
     </Link>
   )
 }
