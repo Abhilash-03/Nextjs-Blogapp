@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CommentForm from "./CommentForm";
 import { useSession } from "next-auth/react";
 import { motion } from "motion/react";
@@ -13,8 +13,20 @@ const CommentItem = ({ comment, postId, depth = 0 }) => {
   const [showReply, setShowReply] = useState(false);
   const [likes, setLikes] = useState(comment.likes?.length || 0);
   const [dislikes, setDislikes] = useState(comment.dislikes?.length || 0);
-  const [liked, setLiked] = useState(comment.likes?.includes(session?.user?._id));
-  const [disliked, setDisliked] = useState(comment.dislikes?.includes(session?.user?._id));
+  
+  const [liked, setLiked] = useState(false);
+  const [disliked, setDisliked] = useState(false);
+
+  // Update liked/disliked state when session loads
+  useEffect(() => {
+    const userId = session?.user?.id;
+    if (userId) {
+      const hasLiked = comment.likes?.some(id => id?.toString() === userId?.toString());
+      const hasDisliked = comment.dislikes?.some(id => id?.toString() === userId?.toString());
+      setLiked(!!hasLiked);
+      setDisliked(!!hasDisliked);
+    }
+  }, [session?.user?.id, comment.likes, comment.dislikes]);
 
   const avatar = comment.userId?.image || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
   const author = comment.userId?.name || "Anonymous";
@@ -24,29 +36,43 @@ const CommentItem = ({ comment, postId, depth = 0 }) => {
   const handleLikeDislike = async (action) => {
     if (!session) return;
 
-    // optimistic update
+    // Store previous state for potential rollback
+    const prevLiked = liked;
+    const prevDisliked = disliked;
+    const prevLikes = likes;
+    const prevDislikes = dislikes;
+
+    // Optimistic update
     if (action === "like") {
-      setLiked((prev) => {
-        if (prev) {
-          setLikes((l) => Math.max(l - 1, 0));
-          return false;
-        }
-        setLikes((l) => l + 1);
-        if (disliked) setDislikes((d) => Math.max(d - 1, 0));
-        setDisliked(false);
-        return true;
-      });
-    } else {
-      setDisliked((prev) => {
-        if (prev) {
-          setDislikes((d) => Math.max(d - 1, 0));
-          return false;
-        }
-        setDislikes((d) => d + 1);
-        if (liked) setLikes((l) => Math.max(l - 1, 0));
+      if (liked) {
+        // Already liked, remove like
         setLiked(false);
-        return true;
-      });
+        setLikes(l => Math.max(l - 1, 0));
+      } else {
+        // Add like
+        setLiked(true);
+        setLikes(l => l + 1);
+        // Remove dislike if present
+        if (disliked) {
+          setDisliked(false);
+          setDislikes(d => Math.max(d - 1, 0));
+        }
+      }
+    } else {
+      if (disliked) {
+        // Already disliked, remove dislike
+        setDisliked(false);
+        setDislikes(d => Math.max(d - 1, 0));
+      } else {
+        // Add dislike
+        setDisliked(true);
+        setDislikes(d => d + 1);
+        // Remove like if present
+        if (liked) {
+          setLiked(false);
+          setLikes(l => Math.max(l - 1, 0));
+        }
+      }
     }
 
     try {
@@ -56,20 +82,11 @@ const CommentItem = ({ comment, postId, depth = 0 }) => {
         body: JSON.stringify({ action })
       });
     } catch (error) {
-      // revert on error
-      if (action === "like") {
-        setLiked((prev) => {
-          if (!prev) return prev;
-          setLikes((l) => Math.max(l - 1, 0));
-          return false;
-        });
-      } else {
-        setDisliked((prev) => {
-          if (!prev) return prev;
-          setDislikes((d) => Math.max(d - 1, 0));
-          return false;
-        });
-      }
+      // Revert to previous state on error
+      setLiked(prevLiked);
+      setDisliked(prevDisliked);
+      setLikes(prevLikes);
+      setDislikes(prevDislikes);
     }
   };
 
