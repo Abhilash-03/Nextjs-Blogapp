@@ -185,19 +185,7 @@ const PostDetailShell = ({ post }) => {
           {/* Article Content */}
           <article className="pb-12">
             <div 
-              className="
-                prose prose-lg dark:prose-invert max-w-none
-                prose-headings:font-bold prose-headings:tracking-tight
-                prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl
-                prose-p:text-foreground/85 prose-p:leading-relaxed
-                prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                prose-strong:text-foreground prose-strong:font-semibold
-                prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-                prose-pre:bg-card prose-pre:border prose-pre:border-border
-                prose-blockquote:border-l-primary prose-blockquote:bg-muted/30 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
-                prose-img:rounded-xl prose-img:shadow-lg
-                prose-li:text-foreground/85
-              " 
+              className="article-content"
               dangerouslySetInnerHTML={{__html: post.content}} 
             />
           </article>
