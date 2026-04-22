@@ -10,7 +10,6 @@ const AdminPage = () => {
     const [activeTab, setActiveTab] = useState('users');
     const router = useRouter();
     useEffect(() => {
-        console.log(session);
         if(status === 'unauthenticated' || session?.user?.role !== 'admin'){
             router.push('/');
         }

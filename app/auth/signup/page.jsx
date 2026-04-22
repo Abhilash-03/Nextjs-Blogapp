@@ -43,7 +43,6 @@ const SignUpPage = () => {
             body: JSON.stringify(form),
             headers: { 'Content-Type': 'application/json'}
         })
-        console.log(res);
         const data = await res.json();
         setLoading(false);
 

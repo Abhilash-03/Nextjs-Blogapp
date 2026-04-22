@@ -16,7 +16,7 @@ const UpdatePostPage = () => {
   }, [])
    
   //  console.log(slug);
-   console.log(editPost);
+  //  console.log(editPost);
   return (
     <div className='max-w-[80%] mx-auto w-full mt-10'>
       <BlogEditor editPost = {editPost} />

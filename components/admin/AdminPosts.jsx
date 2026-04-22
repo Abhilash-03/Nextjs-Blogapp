@@ -14,7 +14,7 @@ const AdminPosts = () => {
         const fetchPosts = async() => {
             const res = await fetch(`/api/admin/posts`);
             const data = await res.json();
-            console.log(data);
+            // console.log(data);
             setPosts(data.posts);
         }
         fetchPosts();

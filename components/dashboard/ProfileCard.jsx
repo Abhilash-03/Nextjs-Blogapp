@@ -1,13 +1,35 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
+import EditProfileModal from './EditProfileModal';
+import { useRouter } from 'next/navigation';
 
 const ProfileCard = ({ session }) => {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [userData, setUserData] = useState({
+    name: session?.user?.name,
+    email: session?.user?.email,
+    image: session?.user?.image,
+    role: session?.user?.role
+  });
+  const router = useRouter();
+
+  const handleProfileUpdate = (updatedUser) => {
+    setUserData({
+      name: updatedUser.name,
+      email: updatedUser.email,
+      image: updatedUser.image,
+      role: updatedUser.role
+    });
+    router.refresh();
+  };
+
   const stats = [
     { 
       label: 'Account Type', 
-      value: session?.user?.role || 'user',
+      value: userData?.role || 'user',
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -73,7 +95,7 @@ const ProfileCard = ({ session }) => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Welcome back, {session?.user?.name?.split(' ')[0] || 'User'}!</p>
+            <p className="text-sm text-muted-foreground">Welcome back, {userData?.name?.split(' ')[0] || 'User'}!</p>
           </div>
         </div>
       </motion.div>
@@ -97,7 +119,7 @@ const ProfileCard = ({ session }) => {
               className="relative"
             >
               <img
-                src={session?.user?.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'}
+                src={userData?.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'}
                 alt="Profile"
                 className="w-24 h-24 rounded-2xl border-4 border-background object-cover shadow-lg"
               />
@@ -106,12 +128,15 @@ const ProfileCard = ({ session }) => {
 
             {/* User info */}
             <div className="flex-1 pb-1">
-              <h2 className="text-xl font-bold text-foreground capitalize">{session?.user?.name || 'User'}</h2>
-              <p className="text-sm text-muted-foreground">{session?.user?.email || ''}</p>
+              <h2 className="text-xl font-bold text-foreground capitalize">{userData?.name || 'User'}</h2>
+              <p className="text-sm text-muted-foreground">{userData?.email || ''}</p>
             </div>
 
             {/* Edit profile button */}
-            <button className="px-4 py-2 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+            <button 
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-4 py-2 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
               Edit Profile
             </button>
           </div>
@@ -186,6 +211,14 @@ const ProfileCard = ({ session }) => {
           </div>
         </div>
       </motion.div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        user={userData}
+        onUpdate={handleProfileUpdate}
+      />
     </div>
   );
 };
