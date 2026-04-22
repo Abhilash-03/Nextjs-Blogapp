@@ -388,3 +388,21 @@
 .dark .article-content img {
   box-shadow: 0 10px 40px -10px oklch(0 0 0 / 0.5);
 }
+
+/* Animated gradient border */
+@keyframes gradient-rotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-border {
+  background-size: 200% 200%;
+  animation: gradient-rotate 3s linear infinite;
+}
