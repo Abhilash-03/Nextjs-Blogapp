@@ -11,7 +11,8 @@ const PostSchema = new mongoose.Schema({
     author : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
+    },
+    views: {type: Number, default: 0}
 }, {timestamps: true});
 
 export const Post = models.Post || model('Post', PostSchema);
