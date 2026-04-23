@@ -31,6 +31,29 @@ const PostDetailShell = ({ post }) => {
   const router = useRouter();
   const readingTime = getReadingTime(post.content);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [views, setViews] = useState(post.views || 0);
+
+  // Track view on mount
+  useEffect(() => {
+    const trackView = async () => {
+      // Check if already viewed in this session
+      const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
+      if (viewedPosts.includes(post.slug)) return;
+
+      try {
+        const res = await fetch(`/api/posts/${post.slug}/views`, { method: 'POST' });
+        if (res.ok) {
+          const data = await res.json();
+          setViews(data.views);
+          sessionStorage.setItem('viewedPosts', JSON.stringify([...viewedPosts, post.slug]));
+        }
+      } catch (error) {
+        console.error('Failed to track view:', error);
+      }
+    };
+
+    trackView();
+  }, [post.slug]);
 
   // Track scroll position to show/hide back to top button
   useEffect(() => {
@@ -97,6 +120,13 @@ const PostDetailShell = ({ post }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 {formatDate(post.createdAt)}
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/80 text-xs font-medium text-muted-foreground">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                {views.toLocaleString()} views
               </span>
             </div>
 
