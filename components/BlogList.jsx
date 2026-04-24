@@ -1,13 +1,26 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import BlogCard from './BlogCard';
 import SearchBar from './SearchBar';
+import TagFilter from './TagFilter';
 
-const BlogList = ({ initialPosts }) => {
+const BlogList = ({ initialPosts, allTags = [] }) => {
     const [posts, setPosts] = useState(initialPosts);
     const [isSearching, setIsSearching] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedTags, setSelectedTags] = useState([]);
+
+    // Filter posts by selected tags (client-side)
+    const filteredPosts = useMemo(() => {
+        if (selectedTags.length === 0) return posts;
+        
+        return posts.filter(post => {
+            const postTags = post.tags || [];
+            // Post must have at least one of the selected tags
+            return selectedTags.some(tag => postTags.includes(tag));
+        });
+    }, [posts, selectedTags]);
 
     const handleSearch = useCallback(async (query) => {
         setSearchQuery(query);
@@ -33,13 +46,32 @@ const BlogList = ({ initialPosts }) => {
         }
     }, [initialPosts]);
 
+    const handleTagsChange = (tags) => {
+        setSelectedTags(tags);
+    };
+
+    // Get active filter description
+    const getFilterDescription = () => {
+        const parts = [];
+        if (searchQuery) parts.push(`matching "${searchQuery}"`);
+        if (selectedTags.length > 0) parts.push(`tagged with ${selectedTags.join(', ')}`);
+        return parts.length > 0 ? parts.join(' and ') : '';
+    };
+
     return (
         <>
+            {/* Tag Filter - always show section */}
+            <TagFilter 
+                tags={allTags} 
+                selectedTags={selectedTags} 
+                onTagsChange={handleTagsChange} 
+            />
+
             {/* Filter bar with search */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-foreground">
-                        {searchQuery ? 'Search Results' : 'Latest Posts'}
+                        {searchQuery || selectedTags.length > 0 ? 'Filtered Results' : 'Latest Posts'}
                     </span>
                     <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
                 </div>
@@ -59,19 +91,17 @@ const BlogList = ({ initialPosts }) => {
                     </span>
                 ) : (
                     <span>
-                        {searchQuery 
-                            ? `Found ${posts.length} article${posts.length !== 1 ? 's' : ''} for "${searchQuery}"`
-                            : `Showing ${posts.length} articles`
-                        }
+                        {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''}
+                        {getFilterDescription() && <span className="text-muted-foreground/70"> {getFilterDescription()}</span>}
                     </span>
                 )}
             </div>
 
             {/* Posts grid */}
-            {posts.length === 0 ? (
+            {filteredPosts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-dashed border-border bg-card/30">
                     <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-2xl bg-muted/50">
-                        {searchQuery ? (
+                        {searchQuery || selectedTags.length > 0 ? (
                             <svg className="w-8 h-8 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
@@ -82,18 +112,18 @@ const BlogList = ({ initialPosts }) => {
                         )}
                     </div>
                     <h3 className="text-xl font-semibold text-foreground mb-2">
-                        {searchQuery ? 'No results found' : 'No articles yet'}
+                        {searchQuery || selectedTags.length > 0 ? 'No results found' : 'No articles yet'}
                     </h3>
                     <p className="text-sm text-muted-foreground text-center max-w-sm">
-                        {searchQuery 
-                            ? `Try adjusting your search terms or browse all articles.`
+                        {searchQuery || selectedTags.length > 0
+                            ? `Try adjusting your filters or browse all articles.`
                             : 'Check back soon for new stories and insights from our community.'
                         }
                     </p>
                 </div>
             ) : (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {posts.map((post) => (
+                    {filteredPosts.map((post) => (
                         <BlogCard key={post._id} post={post} />
                     ))}
                 </div>

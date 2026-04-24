@@ -5,11 +5,20 @@ import React from 'react'
 
 const BlogPage = async() => {
     await connectToDB();
-      // Use `.lean()` to return plain JavaScript objects
-      const posts = await Post.find()
+    
+    // Fetch posts with lean() for plain JavaScript objects
+    const posts = await Post.find()
       .sort({ createdAt: -1 })
-      .populate('author', 'name email image') // optional, if you want to show author info
+      .populate('author', 'name email image')
       .lean();
+    
+    // Get unique tags with counts
+    const tagAggregation = await Post.aggregate([
+      { $unwind: "$tags" },
+      { $group: { _id: "$tags", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $project: { name: "$_id", count: 1, _id: 0 } }
+    ]);
     
     const plainPosts = posts.map((post) => ({
       ...post,
@@ -54,13 +63,19 @@ const BlogPage = async() => {
               <p className="text-3xl font-bold text-foreground">{new Set(plainPosts.map(p => p.author?._id)).size}</p>
               <p className="text-sm text-muted-foreground">Contributing authors</p>
             </div>
+            {tagAggregation.length > 0 && (
+              <div>
+                <p className="text-3xl font-bold text-foreground">{tagAggregation.length}</p>
+                <p className="text-sm text-muted-foreground">Topics</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
       {/* Content Section */}
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <BlogList initialPosts={plainPosts} />
+        <BlogList initialPosts={plainPosts} allTags={tagAggregation} />
       </div>
     </div>
   )

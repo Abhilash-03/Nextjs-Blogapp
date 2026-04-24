@@ -13,6 +13,8 @@ const BlogEditor = ({ editPost }) => {
   const [editorHtml, setEditorHtml] = useState('');
   const [image, setImage] = useState('');
   const [slug, setSlug] = useState('');
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState('');
   const [uploading, setUploading] = useState(false);
   const [inlineUploading, setInlineUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState('');
@@ -38,6 +40,7 @@ const BlogEditor = ({ editPost }) => {
       setEditorHtml(editPost.content || '');
       setImage(editPost.image || '');
       setSlug(editPost.slug || '');
+      setTags(editPost.tags || []);
     }
   }, [editPost]);
 
@@ -48,6 +51,28 @@ const BlogEditor = ({ editPost }) => {
       setSlug(newSlug);
     }
   }, [title])
+
+  // Tag handling functions
+  const addTag = (tag) => {
+    const cleanTag = tag.toLowerCase().trim();
+    if (cleanTag && !tags.includes(cleanTag) && tags.length < 5) {
+      setTags([...tags, cleanTag]);
+    }
+    setTagInput('');
+  };
+
+  const removeTag = (tagToRemove) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTag(tagInput);
+    } else if (e.key === 'Backspace' && !tagInput && tags.length > 0) {
+      removeTag(tags[tags.length - 1]);
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -76,6 +101,7 @@ const BlogEditor = ({ editPost }) => {
       content: editorHtml,
       image,
       slug,
+      tags,
     };
 
     const endpoint = editPost ? `/api/posts/${editPost._id}` : '/api/posts/new';
@@ -250,6 +276,42 @@ const BlogEditor = ({ editPost }) => {
             required
           />
         </div>
+      </div>
+
+      {/* Tags Input */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-foreground">Tags</label>
+        <div className="flex flex-wrap items-center gap-2 p-3 rounded-xl border border-border bg-background min-h-[52px] focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium capitalize"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => removeTag(tag)}
+                className="hover:bg-primary/20 rounded-full p-0.5 transition-colors"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          ))}
+          {tags.length < 5 && (
+            <input
+              type="text"
+              className="flex-1 min-w-[120px] bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none"
+              placeholder={tags.length === 0 ? "Add tags (press Enter or comma)" : "Add more..."}
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={handleTagKeyDown}
+              onBlur={() => tagInput && addTag(tagInput)}
+            />
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground">Add up to 5 tags to categorize your post ({tags.length}/5)</p>
       </div>
 
       {/* Cover Image Upload */}

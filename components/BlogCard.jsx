@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import BookmarkButton from "@/components/BookmarkButton";
+import { getTagColor } from "@/components/TagFilter";
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
 
@@ -96,6 +97,25 @@ const BlogCard = ({ post }) => {
           <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
             {post.description || "Explore this article to discover new insights and perspectives..."}
           </p>
+
+          {/* Tags */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {post.tags.slice(0, 3).map((tag) => (
+                <span 
+                  key={tag} 
+                  className={`inline-block px-2 py-0.5 rounded-md text-[10px] font-medium border capitalize ${getTagColor(tag)}`}
+                >
+                  {tag}
+                </span>
+              ))}
+              {post.tags.length > 3 && (
+                <span className="inline-block px-2 py-0.5 rounded-md text-[10px] font-medium text-muted-foreground bg-muted/50">
+                  +{post.tags.length - 3}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Footer */}
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
