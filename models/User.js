@@ -15,7 +15,26 @@ const UserSchema = new mongoose.Schema({
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    bookmarks: {
+        type: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post'
+        }],
+        default: []
     }
 }, {timestamps: true});
 
-export const User = mongoose.models.User || mongoose.model('User', UserSchema);
+// Force re-register model with updated schema
+let User;
+try {
+    // Delete cached model if it exists
+    if (mongoose.models.User) {
+        delete mongoose.models.User;
+    }
+    User = mongoose.model('User', UserSchema);
+} catch (e) {
+    User = mongoose.model('User');
+}
+
+export { User };
