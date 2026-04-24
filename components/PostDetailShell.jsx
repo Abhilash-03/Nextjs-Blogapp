@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CommentSection from "@/components/comments/CommentSection";
 import ShareButton from "@/components/ShareButton";
+import TableOfContents, { addHeadingIds, SidebarTableOfContents } from "@/components/TableOfContents";
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
 
@@ -32,11 +33,13 @@ const PostDetailShell = ({ post }) => {
   const readingTime = getReadingTime(post.content);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [views, setViews] = useState(post.views || 0);
+  
+  // Process content to add IDs to headings for TOC
+  const processedContent = useMemo(() => addHeadingIds(post.content), [post.content]);
 
   // Track view on mount
   useEffect(() => {
     const trackView = async () => {
-      // Check if already viewed in this session
       const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
       if (viewedPosts.includes(post.slug)) return;
 
@@ -100,12 +103,12 @@ const PostDetailShell = ({ post }) => {
         </div>
 
         {/* Title overlay on hero */}
-        <div className="absolute bottom-0 left-0 right-0 z-20 px-4">
+        <div className="absolute bottom-0 left-0 right-0 z-20 px-4 md:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-4xl mx-auto pb-8"
+            className="max-w-7xl mx-auto pb-8"
           >
             {/* Category/Meta tags */}
             <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -138,111 +141,126 @@ const PostDetailShell = ({ post }) => {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="relative max-w-4xl mx-auto px-4 -mt-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          {/* Author Card */}
-          {post.author && (
-            <div className="flex items-center justify-between gap-4 py-6 border-b border-border mb-8">
-              <div className="flex items-center gap-4">
-                <img 
-                  src={post.author.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'} 
-                  alt={post.author.name}
-                  className="w-12 h-12 rounded-full object-cover ring-2 ring-background shadow-lg"
-                />
-                <div>
-                  <p className="font-semibold text-foreground">{post.author.name || 'Unknown Author'}</p>
-                  <p className="text-sm text-muted-foreground">Author</p>
+      {/* Main Content Area with Flex Layout */}
+      <div className="relative px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col xl:flex-row gap-8">
+            {/* LEFT: TOC Sidebar - only on xl+ screens */}
+            <aside className="hidden xl:block w-64 flex-shrink-0">
+              <SidebarTableOfContents content={processedContent} />
+            </aside>
+            
+            {/* RIGHT: Main Content Column */}
+            <div className="flex-1 max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+              >
+                {/* Author Card */}
+                {post.author && (
+                  <div className="flex items-center justify-between gap-4 py-6 border-b border-border mb-8">
+                    <div className="flex items-center gap-4">
+                      <img 
+                        src={post.author.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'} 
+                        alt={post.author.name}
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-background shadow-lg"
+                      />
+                      <div>
+                        <p className="font-semibold text-foreground">{post.author.name || 'Unknown Author'}</p>
+                        <p className="text-sm text-muted-foreground">Author</p>
+                      </div>
+                    </div>
+                    
+                    {/* Share button */}
+                    <ShareButton title={post.title} description={post.description} />
+                  </div>
+                )}
+
+                {/* Article Content */}
+                <article className="pb-12">
+                  <div 
+                    className="article-content"
+                    dangerouslySetInnerHTML={{__html: processedContent}} 
+                  />
+                </article>
+
+                {/* Tags Section (if available) */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 py-6 border-t border-border">
+                    {post.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1.5 rounded-full bg-muted/50 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Author Bio Card */}
+                {post.author && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="my-12 p-6 rounded-2xl bg-card/50 border border-border backdrop-blur-sm"
+                  >
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <img 
+                        src={post.author.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'} 
+                        alt={post.author.name}
+                        className="w-16 h-16 rounded-2xl object-cover ring-2 ring-background shadow-lg"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-primary mb-1">Written by</p>
+                        <p className="text-xl font-bold text-foreground mb-1">{post.author.name || 'Unknown Author'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Thank you for reading! Follow for more articles and updates.
+                        </p>
+                      </div>
+                      <Link 
+                        href={`/blog?author=${post.author.id}`}
+                        className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
+                      >
+                        View all posts
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Divider */}
+                <div className="relative py-8">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-border"></div>
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="px-4 bg-background text-muted-foreground text-sm">
+                      Comments
+                    </span>
+                  </div>
                 </div>
-              </div>
-              
-              {/* Share button */}
-              <ShareButton title={post.title} description={post.description} />
-            </div>
-          )}
 
-          {/* Article Content */}
-          <article className="pb-12">
-            <div 
-              className="article-content"
-              dangerouslySetInnerHTML={{__html: post.content}} 
-            />
-          </article>
-
-          {/* Tags Section (if available) */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 py-6 border-t border-border">
-              {post.tags.map((tag, index) => (
-                <span 
-                  key={index}
-                  className="px-3 py-1.5 rounded-full bg-muted/50 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors cursor-pointer"
+                {/* Comments Section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="pb-16"
                 >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Author Bio Card */}
-          {post.author && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="my-12 p-6 rounded-2xl bg-card/50 border border-border backdrop-blur-sm"
-            >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <img 
-                  src={post.author.image || 'https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png'} 
-                  alt={post.author.name}
-                  className="w-16 h-16 rounded-2xl object-cover ring-2 ring-background shadow-lg"
-                />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-primary mb-1">Written by</p>
-                  <p className="text-xl font-bold text-foreground mb-1">{post.author.name || 'Unknown Author'}</p>
-                  <p className="text-sm text-muted-foreground">
-                    Thank you for reading! Follow for more articles and updates.
-                  </p>
-                </div>
-                <Link 
-                  href={`/blog?author=${post.author.id}`}
-                  className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors"
-                >
-                  View all posts
-                </Link>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Divider */}
-          <div className="relative py-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="px-4 bg-background text-muted-foreground text-sm">
-                💬 Comments
-              </span>
+                  <CommentSection postId={post.id} />
+                </motion.div>
+              </motion.div>
             </div>
           </div>
-
-          {/* Comments Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="pb-16"
-          >
-            <CommentSection postId={post.id} />
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
+
+      {/* Mobile/Tablet floating TOC button */}
+      <TableOfContents content={processedContent} />
 
       {/* Back to top button */}
       <AnimatePresence>
@@ -253,7 +271,7 @@ const PostDetailShell = ({ post }) => {
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2 }}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="fixed bottom-6 right-6 p-3 rounded-full bg-card border border-border shadow-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all z-50"
+            className="fixed bottom-6 left-6 p-3 rounded-full bg-card border border-border shadow-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all z-40"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -266,4 +284,3 @@ const PostDetailShell = ({ post }) => {
 }
 
 export default PostDetailShell;
-

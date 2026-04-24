@@ -406,3 +406,40 @@
   background-size: 200% 200%;
   animation: gradient-rotate 3s linear infinite;
 }
+
+/* Custom Scrollbar Styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.2);
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.scrollbar-thin:hover::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.4);
+}
+
+.scrollbar-thumb-primary\/20::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.2);
+}
+
+.scrollbar-thumb-primary\/40::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.4);
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
+}
