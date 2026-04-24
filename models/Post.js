@@ -14,8 +14,7 @@ const PostSchema = new mongoose.Schema({
     },
     tags: {
         type: [String],
-        default: [],
-        set: (tags) => tags.map(tag => tag.toLowerCase().trim())
+        default: []
     },
     views: {type: Number, default: 0}
 }, {timestamps: true});

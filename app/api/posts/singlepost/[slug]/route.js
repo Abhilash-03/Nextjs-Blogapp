@@ -6,8 +6,7 @@ export const GET = async(req, {params})=> {
     try {
         await connectToDB();
         const { slug } = await params;
-        const singlePost = await Post.findOne({slug});
-        console.log("Post", singlePost);
+        const singlePost = await Post.findOne({slug}).lean();
         if(!singlePost) return NextResponse.json({ message: 'Post not found' }, { status: 404 });
 
         return NextResponse.json(singlePost, {status: 200});

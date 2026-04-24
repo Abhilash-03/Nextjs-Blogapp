@@ -24,7 +24,8 @@ export const PATCH = async(req, {params}) => {
     try {
         await connectToDB();
         const { id } = await params;
-        const { title, content, image, slug, tags } = await req.json();
+        const body = await req.json();
+        const { title, content, image, slug, tags } = body;
 
         const updatedPost = await Post.findByIdAndUpdate(id, {
             title,
@@ -33,6 +34,7 @@ export const PATCH = async(req, {params}) => {
             slug,
             tags: tags || []
         }, {new : true});
+        
         if(!updatedPost) {
             return NextResponse.json({ message: 'No post found' }, { status: 404 })
         }

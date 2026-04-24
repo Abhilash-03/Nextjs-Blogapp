@@ -10,7 +10,9 @@ export async function POST(req) {
 
     if(!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { title, content, image, slug: customSlug, tags } = await req.json();
+    const body = await req.json();
+    const { title, content, image, slug: customSlug, tags } = body;
+    
     const generateSlug = (value) => {
         return value
           .toLowerCase()
@@ -38,6 +40,7 @@ export async function POST(req) {
         return NextResponse.json(newPost, { status: 201 });
 
     } catch (error) {
+        console.log("Error saving post:", error);
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
