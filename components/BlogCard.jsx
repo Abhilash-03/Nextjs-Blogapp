@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "motion/react";
+import BookmarkButton from "@/components/BookmarkButton";
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
 
@@ -61,6 +62,13 @@ const BlogCard = ({ post }) => {
               </svg>
               {readingTime} min
             </span>
+          </div>
+          
+          {/* Bookmark button */}
+          <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="bg-background/90 backdrop-blur-sm rounded-full shadow-sm">
+              <BookmarkButton postId={post._id} size="small" />
+            </div>
           </div>
         </div>
 

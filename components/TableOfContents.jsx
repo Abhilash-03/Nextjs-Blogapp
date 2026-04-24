@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 
-// Parse headings from HTML content
+// Parse headings from HTML content (client-side only)
 const parseHeadings = (content) => {
-    if (!content) return [];
+    if (!content || typeof window === 'undefined') return [];
     
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
@@ -36,10 +36,21 @@ export const addHeadingIds = (content) => {
     });
 };
 
+// Hook to parse headings on client side only
+const useHeadings = (content) => {
+    const [headings, setHeadings] = useState([]);
+    
+    useEffect(() => {
+        setHeadings(parseHeadings(content));
+    }, [content]);
+    
+    return headings;
+};
+
 // Inline TOC component (shown above content on medium screens)
 export const InlineTableOfContents = ({ content }) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const headings = useMemo(() => parseHeadings(content), [content]);
+    const headings = useHeadings(content);
     
     if (headings.length < 3) return null;
     
@@ -112,12 +123,12 @@ export const InlineTableOfContents = ({ content }) => {
 // Sidebar TOC component (for xl+ screens)
 export const SidebarTableOfContents = ({ content }) => {
     const [activeId, setActiveId] = useState('');
-    const headings = useMemo(() => parseHeadings(content), [content]);
-    
-    if (headings.length < 3) return null;
+    const headings = useHeadings(content);
     
     // Track active heading on scroll
     useEffect(() => {
+        if (headings.length === 0) return;
+        
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -145,6 +156,8 @@ export const SidebarTableOfContents = ({ content }) => {
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
     };
+    
+    if (headings.length < 3) return null;
     
     return (
         <div className="sticky top-24">
@@ -184,9 +197,7 @@ export const SidebarTableOfContents = ({ content }) => {
 // Mobile floating TOC button
 const TableOfContents = ({ content }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const headings = useMemo(() => parseHeadings(content), [content]);
-    
-    if (headings.length < 3) return null;
+    const headings = useHeadings(content);
     
     const scrollToHeading = (id) => {
         const element = document.getElementById(id);
@@ -197,6 +208,8 @@ const TableOfContents = ({ content }) => {
             setIsOpen(false);
         }
     };
+    
+    if (headings.length < 3) return null;
     
     return (
         <>

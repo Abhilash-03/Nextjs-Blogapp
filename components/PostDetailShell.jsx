@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import CommentSection from "@/components/comments/CommentSection";
 import ShareButton from "@/components/ShareButton";
+import BookmarkButton from "@/components/BookmarkButton";
 import TableOfContents, { addHeadingIds, SidebarTableOfContents } from "@/components/TableOfContents";
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
@@ -172,8 +173,11 @@ const PostDetailShell = ({ post }) => {
                       </div>
                     </div>
                     
-                    {/* Share button */}
-                    <ShareButton title={post.title} description={post.description} />
+                    {/* Share and Bookmark buttons */}
+                    <div className="flex items-center gap-2">
+                      <BookmarkButton postId={post.id} showText />
+                      <ShareButton title={post.title} description={post.description} />
+                    </div>
                   </div>
                 )}
 
