@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/lib/mongodb";
 import { Post } from "@/models/Post";
+import mongoose from "mongoose";
 
 // POST - Increment view count
 export async function POST(req, { params }) {
@@ -8,9 +9,14 @@ export async function POST(req, { params }) {
         await connectToDB();
         const { id } = await params;
 
+        // Build query - only include _id if it's a valid ObjectId
+        const query = mongoose.Types.ObjectId.isValid(id)
+            ? { $or: [{ slug: id }, { _id: id }] }
+            : { slug: id };
+
         // Find post by slug or ID and increment views
         const post = await Post.findOneAndUpdate(
-            { $or: [{ slug: id }, { _id: id }] },
+            query,
             { $inc: { views: 1 } },
             { new: true }
         );
@@ -32,9 +38,12 @@ export async function GET(req, { params }) {
         await connectToDB();
         const { id } = await params;
 
-        const post = await Post.findOne(
-            { $or: [{ slug: id }, { _id: id }] }
-        ).select('views');
+        // Build query - only include _id if it's a valid ObjectId
+        const query = mongoose.Types.ObjectId.isValid(id)
+            ? { $or: [{ slug: id }, { _id: id }] }
+            : { slug: id };
+
+        const post = await Post.findOne(query).select('views');
 
         if (!post) {
             return NextResponse.json({ error: "Post not found" }, { status: 404 });
