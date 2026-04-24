@@ -56,7 +56,8 @@ const BlogEditor = ({ editPost }) => {
   const addTag = (tag) => {
     const cleanTag = tag.toLowerCase().trim();
     if (cleanTag && !tags.includes(cleanTag) && tags.length < 5) {
-      setTags([...tags, cleanTag]);
+      const newTags = [...tags, cleanTag];
+      setTags(newTags);
     }
     setTagInput('');
   };

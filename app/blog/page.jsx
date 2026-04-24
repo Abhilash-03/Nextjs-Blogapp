@@ -14,17 +14,19 @@ const BlogPage = async() => {
     
     // Get unique tags with counts
     const tagAggregation = await Post.aggregate([
+      { $match: { tags: { $exists: true, $ne: [] } } },
       { $unwind: "$tags" },
       { $group: { _id: "$tags", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $project: { name: "$_id", count: 1, _id: 0 } }
     ]);
-    
+        
     const plainPosts = posts.map((post) => ({
       ...post,
       _id: post._id.toString(),
       createdAt: post.createdAt.toISOString(),
       updatedAt: post.updatedAt?.toISOString(),
+      tags: post.tags || [],
       author: post.author ? {
         ...post.author,
         _id: post.author._id.toString(),
