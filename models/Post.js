@@ -12,7 +12,15 @@ const PostSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
+    tags: {
+        type: [String],
+        default: [],
+        set: (tags) => tags.map(tag => tag.toLowerCase().trim())
+    },
     views: {type: Number, default: 0}
 }, {timestamps: true});
+
+// Index for faster tag queries
+PostSchema.index({ tags: 1 });
 
 export const Post = models.Post || model('Post', PostSchema);
