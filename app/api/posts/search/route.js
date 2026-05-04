@@ -9,15 +9,16 @@ export const GET = async (req) => {
         const { searchParams } = new URL(req.url);
         const query = searchParams.get('q') || '';
         
-        // Build search filter for title and content
+        // Build search filter for title and content (only published posts)
         const searchFilter = query
             ? {
+                published: { $ne: false },
                 $or: [
                     { title: { $regex: query, $options: 'i' } },
                     { content: { $regex: query, $options: 'i' } }
                 ]
             }
-            : {};
+            : { published: { $ne: false } };
         
         const posts = await Post.find(searchFilter)
             .sort({ createdAt: -1 })

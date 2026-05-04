@@ -14,6 +14,7 @@ const UserAllPosts = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'title'
+  const [filterBy, setFilterBy] = useState('all'); // 'all', 'published', 'drafts'
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, postId: null, postTitle: '' });
   const router = useRouter();
 
@@ -60,6 +61,17 @@ const UserAllPosts = () => {
     return 0;
   });
 
+  // Filter posts by published status
+  const filteredPosts = sortedPosts.filter((post) => {
+    if (filterBy === 'published') return post.published !== false;
+    if (filterBy === 'drafts') return post.published === false;
+    return true;
+  });
+
+  // Count stats
+  const publishedCount = posts.filter(p => p.published !== false).length;
+  const draftsCount = posts.filter(p => p.published === false).length;
+
   // Calculate reading time
   const getReadingTime = (content) => {
     if (!content) return 1;
@@ -100,22 +112,42 @@ const UserAllPosts = () => {
     <div className="space-y-6">
       {/* Header bar with stats, view toggle, and actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-muted/50 to-muted/30 border border-border/50">
-        <div className="flex items-center gap-4">
-          {/* Post count */}
+        <div className="flex items-center gap-6">
+          {/* Post counts */}
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10">
-                <span className="text-lg font-bold text-primary">{posts.length}</span>
-              </div>
+            <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/10">
+              <span className="text-lg font-bold text-primary">{posts.length}</span>
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">Total Posts</p>
-              <p className="text-xs text-muted-foreground">Published articles</p>
+              <p className="text-xs text-muted-foreground">{publishedCount} published, {draftsCount} drafts</p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Filter tabs */}
+          <div className="flex items-center p-1 rounded-xl bg-muted/50 border border-border/50">
+            <button
+              onClick={() => setFilterBy('all')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filterBy === 'all' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              All ({posts.length})
+            </button>
+            <button
+              onClick={() => setFilterBy('published')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filterBy === 'published' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Published ({publishedCount})
+            </button>
+            <button
+              onClick={() => setFilterBy('drafts')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${filterBy === 'drafts' ? 'bg-background shadow-sm text-amber-600 dark:text-amber-400' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Drafts ({draftsCount})
+            </button>
+          </div>
+
           {/* Sort dropdown */}
           <div className="relative">
             <select
@@ -169,7 +201,7 @@ const UserAllPosts = () => {
       </div>
 
       <AnimatePresence mode="wait">
-        {posts.length === 0 ? (
+        {filteredPosts.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -181,9 +213,15 @@ const UserAllPosts = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-foreground mb-2">No posts yet</h3>
+            <h3 className="text-2xl font-bold text-foreground mb-2">
+              {filterBy === 'drafts' ? 'No drafts yet' : filterBy === 'published' ? 'No published posts' : 'No posts yet'}
+            </h3>
             <p className="text-muted-foreground mb-8 text-center max-w-sm">
-              Your creative journey starts here. Share your first story with the world!
+              {filterBy === 'drafts' 
+                ? 'Start writing and save as draft to see them here!' 
+                : filterBy === 'published' 
+                  ? 'Publish a post to share it with the world!'
+                  : 'Your creative journey starts here. Share your first story with the world!'}
             </p>
             <Link href="/dashboard/createpost">
               <motion.button
@@ -207,7 +245,7 @@ const UserAllPosts = () => {
             exit={{ opacity: 0 }}
             className="space-y-3"
           >
-            {sortedPosts.map((post, index) => (
+            {filteredPosts.map((post, index) => (
               <motion.div
                 key={post._id}
                 initial={{ opacity: 0, y: 10 }}
@@ -218,7 +256,7 @@ const UserAllPosts = () => {
               >
                 <div className="relative flex flex-col sm:flex-row gap-4 p-4 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
                   {/* Left accent bar */}
-                  <div className="absolute left-0 top-4 bottom-4 w-1 rounded-full bg-gradient-to-b from-primary/60 via-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className={`absolute left-0 top-4 bottom-4 w-1 rounded-full ${post.published === false ? 'bg-gradient-to-b from-amber-500/60 via-amber-500/30 to-transparent' : 'bg-gradient-to-b from-primary/60 via-primary/30 to-transparent'} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                   
                   {/* Thumbnail */}
                   <Link href={`/blog/${post.slug}`} className="shrink-0">
@@ -236,6 +274,15 @@ const UserAllPosts = () => {
                           {getReadingTime(post.content)} min read
                         </span>
                       </div>
+
+                      {/* Draft badge */}
+                      {post.published === false && (
+                        <div className="absolute top-2 right-2">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-[10px] font-medium">
+                            Draft
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </Link>
 
@@ -323,7 +370,7 @@ const UserAllPosts = () => {
             exit={{ opacity: 0 }}
             className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
           >
-            {sortedPosts.map((post, index) => (
+            {filteredPosts.map((post, index) => (
               <motion.div
                 key={post._id}
                 initial={{ opacity: 0, y: 20 }}
@@ -350,6 +397,18 @@ const UserAllPosts = () => {
                       {getReadingTime(post.content)} min
                     </span>
                   </div>
+
+                  {/* Draft badge for grid view */}
+                  {post.published === false && (
+                    <div className="absolute top-3 right-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-amber-500/90 text-white text-xs font-medium">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Draft
+                      </span>
+                    </div>
+                  )}
 
                   {/* Title overlay on image */}
                   <div className="absolute bottom-0 left-0 right-0 p-4">

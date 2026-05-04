@@ -11,7 +11,7 @@ export async function POST(req) {
     if(!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
-    const { title, content, image, slug: customSlug, tags } = body;
+    const { title, content, image, slug: customSlug, tags, published = true } = body;
     
     const generateSlug = (value) => {
         return value
@@ -33,7 +33,8 @@ export async function POST(req) {
             slug,
             image,
             tags: tags || [],
-            author: session.user.id
+            author: session.user.id,
+            published
         })
 
         await newPost.save();

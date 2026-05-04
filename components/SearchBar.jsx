@@ -53,6 +53,7 @@ const SearchBar = ({ onSearch, initialQuery = '' }) => {
                     onBlur={() => setIsFocused(false)}
                     placeholder="Search articles..."
                     className="flex-1 bg-transparent py-3 pr-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    suppressHydrationWarning
                 />
 
                 {/* Clear Button */}

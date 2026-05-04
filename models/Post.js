@@ -16,10 +16,13 @@ const PostSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
-    views: {type: Number, default: 0}
+    views: {type: Number, default: 0},
+    published: {type: Boolean, default: true}
 }, {timestamps: true});
 
 // Index for faster tag queries
 PostSchema.index({ tags: 1 });
+// Index for filtering published posts
+PostSchema.index({ published: 1 });
 
 export const Post = models.Post || model('Post', PostSchema);

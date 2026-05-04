@@ -6,15 +6,15 @@ import React from 'react'
 const BlogPage = async() => {
     await connectToDB();
     
-    // Fetch posts with lean() for plain JavaScript objects
-    const posts = await Post.find()
+    // Fetch only published posts with lean() for plain JavaScript objects
+    const posts = await Post.find({ published: { $ne: false } })
       .sort({ createdAt: -1 })
       .populate('author', 'name email image')
       .lean();
     
-    // Get unique tags with counts
+    // Get unique tags with counts (only from published posts)
     const tagAggregation = await Post.aggregate([
-      { $match: { tags: { $exists: true, $ne: [] } } },
+      { $match: { published: { $ne: false }, tags: { $exists: true, $ne: [] } } },
       { $unwind: "$tags" },
       { $group: { _id: "$tags", count: { $sum: 1 } } },
       { $sort: { count: -1 } },

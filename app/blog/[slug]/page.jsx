@@ -11,9 +11,16 @@ const SinglePostPage = async({ params }) => {
   try {
     await connectToDB();
     const { slug } = await params;
+    const session = await getServerSession(authOptions);
     const post = await Post.findOne({ slug }).populate('author', 'name email image');
     
     if(!post) return notFound();
+    
+    // Check if post is a draft and user is not the author
+    const isAuthor = session?.user?.id === post.author?._id?.toString();
+    if (post.published === false && !isAuthor) {
+      return notFound();
+    }
 
     const plainPost = JSON.parse(JSON.stringify(post));
     const postForClient = {
