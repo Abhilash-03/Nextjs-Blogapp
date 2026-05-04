@@ -430,6 +430,7 @@ const BlogEditor = ({ editPost }) => {
         ['bold', 'italic', 'underline', 'strike'],
         [{ list: 'ordered' }, { list: 'bullet' }],
         ['link', 'image'],
+        ['code-block'],
         ['clean'],
       ],
       handlers: {
