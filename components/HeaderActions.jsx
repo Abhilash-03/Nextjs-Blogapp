@@ -25,7 +25,7 @@ export function HeaderActions() {
       {/* <Link href={'/dashboard/profile'}> */}
       {!session?.user && (
          <Link href={'/auth/signin'}>
-                            <button className="inline-flex items-center gap-2 rounded-xl border border-border px-5 py-3 text-base font-semibold transition hover:border-primary hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black cursor-pointer">
+                            <button className="inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2 md:px-5 md:py-3 text-sm md:text-base font-semibold transition hover:border-primary hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black cursor-pointer">
                               Sign in
                             </button>
                             </Link>

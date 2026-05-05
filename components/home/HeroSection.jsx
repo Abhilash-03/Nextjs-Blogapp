@@ -5,12 +5,12 @@ import Link from 'next/link';
 
 const HeroSection = ({ session }) => {
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+        <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden">
-                {/* Floating orbs */}
+                {/* Floating orbs - smaller on mobile */}
                 <motion.div
-                    className="absolute top-20 left-[10%] w-72 h-72 rounded-full bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 blur-3xl"
+                    className="absolute top-20 left-[5%] md:left-[10%] w-48 md:w-72 h-48 md:h-72 rounded-full bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 blur-3xl"
                     animate={{
                         x: [0, 50, 0],
                         y: [0, 30, 0],
@@ -19,7 +19,7 @@ const HeroSection = ({ session }) => {
                     transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute bottom-20 right-[10%] w-96 h-96 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl"
+                    className="absolute bottom-20 right-[5%] md:right-[10%] w-64 md:w-96 h-64 md:h-96 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl"
                     animate={{
                         x: [0, -40, 0],
                         y: [0, -50, 0],
@@ -28,7 +28,7 @@ const HeroSection = ({ session }) => {
                     transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-primary/10 to-purple-500/10 blur-3xl"
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] md:w-[500px] h-[300px] md:h-[500px] rounded-full bg-gradient-to-r from-primary/10 to-purple-500/10 blur-3xl"
                     animate={{
                         scale: [1, 1.3, 1],
                         opacity: [0.3, 0.5, 0.3],
@@ -40,8 +40,8 @@ const HeroSection = ({ session }) => {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
             </div>
 
-            <div className="relative z-10 max-w-6xl mx-auto px-4 py-20">
-                <div className="text-center space-y-8">
+            <div className="relative z-10 max-w-6xl mx-auto px-4 py-12 md:py-20">
+                <div className="text-center space-y-6 md:space-y-8">
                     {/* Main heading */}
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -49,7 +49,7 @@ const HeroSection = ({ session }) => {
                         transition={{ duration: 0.6, delay: 0.1 }}
                         className="space-y-4"
                     >
-                        <h1 className="text-5xl md:text-7xl font-bold tracking-tight">
+                        <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight">
                             <span className="bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text">
                                 Share your story
                             </span>
@@ -79,7 +79,7 @@ const HeroSection = ({ session }) => {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.98 }}
-                                className="group relative px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold text-lg shadow-lg shadow-violet-500/25 overflow-hidden"
+                                className="group relative px-6 py-3 md:px-8 md:py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold text-base md:text-lg shadow-lg shadow-violet-500/25 overflow-hidden"
                             >
                                 <span className="relative z-10 flex items-center gap-2">
                                     Explore Articles
@@ -101,7 +101,7 @@ const HeroSection = ({ session }) => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="px-8 py-4 rounded-2xl border-2 border-border bg-background/50 backdrop-blur-sm font-semibold text-lg hover:border-primary/50 hover:bg-card transition-all"
+                                    className="px-6 py-3 md:px-8 md:py-4 rounded-2xl border-2 border-border bg-background/50 backdrop-blur-sm font-semibold text-base md:text-lg hover:border-primary/50 hover:bg-card transition-all"
                                 >
                                     Get Started Free
                                 </motion.button>
@@ -111,7 +111,7 @@ const HeroSection = ({ session }) => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="px-8 py-4 rounded-2xl border-2 border-border bg-background/50 backdrop-blur-sm font-semibold text-lg hover:border-primary/50 hover:bg-card transition-all"
+                                    className="px-6 py-3 md:px-8 md:py-4 rounded-2xl border-2 border-border bg-background/50 backdrop-blur-sm font-semibold text-base md:text-lg hover:border-primary/50 hover:bg-card transition-all"
                                 >
                                     Create Post
                                 </motion.button>
@@ -124,7 +124,7 @@ const HeroSection = ({ session }) => {
 
             {/* Scroll indicator */}
             <motion.div
-                className="absolute bottom-8 left-1/2 -translate-x-1/2"
+                className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 hidden sm:block"
                 animate={{ y: [0, 10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
             >

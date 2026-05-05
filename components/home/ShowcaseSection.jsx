@@ -45,9 +45,9 @@ const ShowcaseSection = () => {
     }, [isPaused, isInView, cards.length]);
 
     return (
-        <section ref={ref} className="relative py-24 px-4 overflow-hidden">
+        <section ref={ref} className="relative py-16 md:py-24 px-4 overflow-hidden">
             <div className="max-w-6xl mx-auto">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     {/* Left side - Content */}
                     <motion.div
                         initial={{ opacity: 0, x: -50 }}
@@ -58,7 +58,7 @@ const ShowcaseSection = () => {
                         <span className="inline-block px-4 py-1.5 rounded-full border border-border bg-card/50 text-sm font-medium text-muted-foreground">
                             Showcase
                         </span>
-                        <h2 className="text-3xl md:text-5xl font-bold leading-tight">
+                        <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold leading-tight">
                             Stories that
                             <span className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent"> inspire </span>
                             and
@@ -115,15 +115,15 @@ const ShowcaseSection = () => {
 
                     {/* Right side - Fan cards */}
                     <div 
-                        className="relative h-[450px] flex items-center justify-center perspective-1000"
+                        className="relative h-[350px] md:h-[450px] flex items-center justify-center perspective-1000 order-first lg:order-last"
                         onMouseEnter={() => setIsPaused(true)}
                         onMouseLeave={() => setIsPaused(false)}
                     >
                         {/* Background glow */}
-                        <div className="absolute w-64 h-64 rounded-full bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 blur-3xl" />
+                        <div className="absolute w-48 md:w-64 h-48 md:h-64 rounded-full bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 blur-3xl" />
                         
                         {/* Cards in fan layout */}
-                        <div className="relative w-72 h-96">
+                        <div className="relative w-56 sm:w-64 md:w-72 h-72 sm:h-80 md:h-96">
                             {cards.map((card, index) => {
                                 const isActive = activeIndex === index;
                                 const offset = index - activeIndex;

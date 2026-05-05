@@ -71,7 +71,7 @@ const FeaturesSection = () => {
     const isInView = useInView(ref, { once: true, margin: "-100px" });
 
     return (
-        <section ref={ref} className="relative py-24 px-4 overflow-hidden">
+        <section ref={ref} className="relative py-16 md:py-24 px-4 overflow-hidden">
             {/* Background */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
             
@@ -81,12 +81,12 @@ const FeaturesSection = () => {
                     initial={{ opacity: 0, y: 30 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-16"
+                    className="text-center mb-10 md:mb-16"
                 >
                     <span className="inline-block px-4 py-1.5 rounded-full border border-border bg-card/50 text-sm font-medium text-muted-foreground mb-4">
                         Features
                     </span>
-                    <h2 className="text-3xl md:text-5xl font-bold mb-4">
+                    <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold mb-4">
                         Everything you need to
                         <span className="bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text text-transparent"> create</span>
                     </h2>
@@ -96,7 +96,7 @@ const FeaturesSection = () => {
                 </motion.div>
 
                 {/* Features grid */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {features.map((feature, index) => (
                         <motion.div
                             key={feature.title}

@@ -9,7 +9,7 @@ const CTASection = ({ session }) => {
     const isInView = useInView(ref, { once: true, margin: "-100px" });
 
     return (
-        <section ref={ref} className="relative py-24 px-4 overflow-hidden">
+        <section ref={ref} className="relative py-16 md:py-24 px-4 overflow-hidden">
             {/* Background gradients */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-violet-500/5 to-transparent" />
             <motion.div
@@ -34,7 +34,7 @@ const CTASection = ({ session }) => {
                     initial={{ opacity: 0, y: 50 }}
                     animate={isInView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.6 }}
-                    className="relative rounded-3xl border border-border bg-card/80 backdrop-blur-xl p-8 md:p-12 text-center overflow-hidden"
+                    className="relative rounded-3xl border border-border bg-card/80 backdrop-blur-xl p-6 sm:p-8 md:p-12 text-center overflow-hidden"
                 >
                     {/* Inner glow */}
                     <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-transparent to-fuchsia-500/10 rounded-3xl" />
@@ -81,7 +81,7 @@ const CTASection = ({ session }) => {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold text-lg shadow-lg shadow-violet-500/25"
+                                        className="group px-6 py-3 md:px-8 md:py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold text-base md:text-lg shadow-lg shadow-violet-500/25"
                                     >
                                         <span className="flex items-center gap-2">
                                             Create Your Account
@@ -96,7 +96,7 @@ const CTASection = ({ session }) => {
                                     <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         whileTap={{ scale: 0.98 }}
-                                        className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold text-lg shadow-lg shadow-violet-500/25"
+                                        className="group px-6 py-3 md:px-8 md:py-4 rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-semibold text-base md:text-lg shadow-lg shadow-violet-500/25"
                                     >
                                         <span className="flex items-center gap-2">
                                             Write Your First Post
@@ -112,7 +112,7 @@ const CTASection = ({ session }) => {
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="px-8 py-4 rounded-2xl border-2 border-border bg-background/50 font-semibold text-lg hover:border-primary/50 transition-all"
+                                    className="px-6 py-3 md:px-8 md:py-4 rounded-2xl border-2 border-border bg-background/50 font-semibold text-base md:text-lg hover:border-primary/50 transition-all"
                                 >
                                     Browse Articles
                                 </motion.button>
