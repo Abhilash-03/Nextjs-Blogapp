@@ -5,7 +5,29 @@ export async function middleware(request) {
     try {
         // Auth.js v5 uses AUTH_SECRET, fallback to NEXTAUTH_SECRET for compatibility
         const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET;
-        const token = await getToken({ req: request, secret });
+        
+        // Try to get token with Auth.js v5 cookie name first
+        let token = await getToken({ 
+            req: request, 
+            secret,
+            cookieName: '__Secure-authjs.session-token'  // Production cookie name
+        });
+        
+        // Fallback to development cookie name
+        if (!token) {
+            token = await getToken({ 
+                req: request, 
+                secret,
+                cookieName: 'authjs.session-token'  // Development cookie name
+            });
+        }
+        
+        // Fallback to old next-auth cookie names
+        if (!token) {
+            token = await getToken({ req: request, secret });
+        }
+        
+        console.log('Middleware - Token found:', !!token);
         
         // If no token and trying to access protected routes, redirect to sign in
         if (!token) {
