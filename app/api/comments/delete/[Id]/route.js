@@ -1,14 +1,13 @@
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb"
 import { Comment } from "@/models/Comment";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export const DELETE = async(req, { params }) => {
     try {
         await connectToDB();
         const { id } = await params;
-        const session = await getServerSession(authOptions);
+        const session = await auth();
         if(!session) {
             return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
         }

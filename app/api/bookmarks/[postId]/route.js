@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Post } from "@/models/Post";
@@ -15,7 +14,7 @@ const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 // POST - Toggle bookmark for a post
 export async function POST(req, { params }) {
     try {
-        const session = await getServerSession(authOptions);
+        const session = await auth();
         if (!session) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
@@ -93,7 +92,7 @@ export async function POST(req, { params }) {
 // GET - Check if post is bookmarked
 export async function GET(req, { params }) {
     try {
-        const session = await getServerSession(authOptions);
+        const session = await auth();
         if (!session) {
             console.log("GET bookmark: No session");
             return NextResponse.json({ bookmarked: false }, {

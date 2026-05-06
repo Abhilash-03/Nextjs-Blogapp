@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb";
 import { User } from "@/models/User";
 import { Post } from "@/models/Post";
@@ -8,7 +7,7 @@ import { Post } from "@/models/Post";
 // GET - Get user's bookmarked posts
 export async function GET() {
     try {
-        const session = await getServerSession(authOptions);
+        const session = await auth();
         if (!session) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }

@@ -1,7 +1,6 @@
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb"
 import { Comment } from "@/models/Comment";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 
@@ -10,7 +9,7 @@ export const PATCH = async(req, { params }) => {
         await connectToDB();
         const { commentId: id } = await params;
         console.log("\nComment id", id);
-        const session = await getServerSession(authOptions);
+        const session = await auth();
         if(!session) {
             return NextResponse.json({ message: 'Unauthorized'}, {status: 401})
         }

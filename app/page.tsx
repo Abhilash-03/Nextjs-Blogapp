@@ -1,12 +1,11 @@
-import { authOptions } from "@/lib/authOptions";
-import { getServerSession } from "next-auth";
+import { auth } from "@/lib/auth";
 import HeroSection from "@/components/home/HeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import ShowcaseSection from "@/components/home/ShowcaseSection";
 import CTASection from "@/components/home/CTASection";
 
 export default async function Home() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Background patterns */}

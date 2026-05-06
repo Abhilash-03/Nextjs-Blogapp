@@ -1,18 +1,18 @@
-import { getToken } from 'next-auth/jwt';
+import { auth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-export async function middleware(request) {
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+export default auth((request) => {
+    const { auth: session, nextUrl } = request;
     
-    // If no token and trying to access protected routes, redirect to sign in
-    if (!token) {
-        const signInUrl = new URL('/auth/signin', request.url);
-        signInUrl.searchParams.set('callbackUrl', request.url);
+    // If no session and trying to access protected routes, redirect to sign in
+    if (!session) {
+        const signInUrl = new URL('/auth/signin', nextUrl);
+        signInUrl.searchParams.set('callbackUrl', nextUrl.pathname);
         return NextResponse.redirect(signInUrl);
     }
     
     return NextResponse.next();
-}
+});
 
 // Protect these routes
 export const config = {

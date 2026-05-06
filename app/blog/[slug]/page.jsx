@@ -1,9 +1,8 @@
 import CommentSection from "@/components/comments/CommentSection";
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb"
 import { Post } from "@/models/Post";
 import { User } from "@/models/User";
-import { getServerSession } from "next-auth";
 import { notFound } from "next/navigation";
 import PostDetailShell from "@/components/PostDetailShell";
 
@@ -11,7 +10,7 @@ const SinglePostPage = async({ params }) => {
   try {
     await connectToDB();
     const { slug } = await params;
-    const session = await getServerSession(authOptions);
+    const session = await auth();
     const post = await Post.findOne({ slug }).populate('author', 'name email image');
     
     if(!post) return notFound();

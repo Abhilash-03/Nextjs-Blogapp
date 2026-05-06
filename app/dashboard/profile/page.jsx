@@ -1,11 +1,10 @@
 import Sidebar from '@/components/Sidebar';
-import { authOptions } from '@/lib/authOptions';
-import { getServerSession } from 'next-auth';
+import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import ProfileCard from '@/components/dashboard/ProfileCard';
 
 const DashboardPage = async () => {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) redirect('/auth/signin');
 

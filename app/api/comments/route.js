@@ -1,15 +1,14 @@
-import { authOptions } from "@/lib/authOptions";
+import { auth } from "@/lib/auth";
 import { connectToDB } from "@/lib/mongodb"
 import { Comment } from "@/models/Comment";
 import { Post } from "@/models/Post";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 
 export const POST = async(req) => {
     try {
         await connectToDB();
-        const session = await getServerSession(authOptions);
+        const session = await auth();
         console.log("User id", session.user.id);
         if(!session) {
             return NextResponse.json({ message: 'Unauthorized'}, {status: 401})
