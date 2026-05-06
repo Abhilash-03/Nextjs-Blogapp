@@ -25,16 +25,6 @@ const UserSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-// Force re-register model with updated schema
-let User;
-try {
-    // Delete cached model if it exists
-    if (mongoose.models.User) {
-        delete mongoose.models.User;
-    }
-    User = mongoose.model('User', UserSchema);
-} catch (e) {
-    User = mongoose.model('User');
-}
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
 
 export { User };

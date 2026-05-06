@@ -16,7 +16,7 @@ export async function GET() {
         await connectToDB();
         
         // Ensure Post model is registered
-        const _Post = Post;
+        void Post;
 
         const user = await User.findOne({ email: session.user.email })
             .populate({

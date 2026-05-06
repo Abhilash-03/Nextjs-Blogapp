@@ -4,12 +4,13 @@ import CredentialProvider from 'next-auth/providers/credentials';
 import { connectToDB } from './mongodb';
 import { User } from '@/models/User';
 import bcrypt from 'bcrypt';
+import type { NextAuthOptions } from 'next-auth';
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
-           clientId: process.env.GOOGLE_CLIENT_ID,
-           clientSecret: process.env.GOOGLE_CLIENT_SECRET
+           clientId: process.env.GOOGLE_CLIENT_ID!,
+           clientSecret: process.env.GOOGLE_CLIENT_SECRET!
         }),
         CredentialProvider({
             name: 'credentials',
@@ -19,8 +20,11 @@ export const authOptions = {
             },
 
             async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                    throw new Error('Invalid credentials');
+                }
                 await connectToDB();
-                const user = await User.findOne({email : credentials?.email });
+                const user = await User.findOne({email : credentials.email });
 
                 if(!user || !user.password) throw new Error('Invalid credentials')
 
@@ -38,7 +42,7 @@ export const authOptions = {
         //    console.log("Google Data", user);
         //    console.log("Account", account);
         //    console.log("Profile", profile);
-           if(account.provider === 'google') {
+           if(account?.provider === 'google') {
             const exisitingUser = await User.findOne({ email: user.email});
             if(!exisitingUser) {
                 await User.create({
@@ -54,9 +58,12 @@ export const authOptions = {
         },
         async session({ session }){
             await connectToDB();
+            if (!session.user?.email) return session;
             const dbUser = await User.findOne({ email: session.user.email});
-            session.user.id = dbUser._id?.toString();
-            session.user.role = dbUser.role;
+            if (dbUser) {
+                session.user.id = dbUser._id?.toString();
+                session.user.role = dbUser.role;
+            }
             return session;
         },
     
