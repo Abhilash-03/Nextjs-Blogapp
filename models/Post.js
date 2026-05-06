@@ -25,4 +25,4 @@ PostSchema.index({ tags: 1 });
 // Index for filtering published posts
 PostSchema.index({ published: 1 });
 
-export const Post = models.Post || model('Post', PostSchema);
+export const Post = models?.Post || model('Post', PostSchema);

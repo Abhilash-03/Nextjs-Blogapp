@@ -25,6 +25,7 @@ const UserSchema = new mongoose.Schema({
     }
 }, {timestamps: true});
 
-const User = mongoose.models.User || mongoose.model('User', UserSchema);
+// Ensure mongoose.models exists before accessing
+const User = (mongoose.models && mongoose.models.User) || mongoose.model('User', UserSchema);
 
 export { User };

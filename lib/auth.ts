@@ -19,25 +19,47 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
 
             async authorize(credentials) {
+                console.log('Auth attempt with credentials:', { email: credentials?.email, hasPassword: !!credentials?.password });
+                
                 if (!credentials?.email || !credentials?.password) {
-                    throw new Error('Invalid credentials');
+                    console.log('Missing email or password');
+                    return null;
                 }
-                await connectToDB();
-                const user = await User.findOne({ email: credentials.email });
+                
+                try {
+                    await connectToDB();
+                    const user = await User.findOne({ email: credentials.email });
+                    console.log('User found:', !!user, user?.email);
 
-                if (!user || !user.password) throw new Error('Invalid credentials');
+                    if (!user) {
+                        console.log('User not found');
+                        return null;
+                    }
+                    
+                    if (!user.password) {
+                        console.log('User has no password (OAuth user)');
+                        return null;
+                    }
 
-                const isMatch = await bcrypt.compare(credentials.password as string, user.password);
+                    const isMatch = await bcrypt.compare(credentials.password as string, user.password);
+                    console.log('Password match:', isMatch);
 
-                if (!isMatch) throw new Error('Invalid credentials');
+                    if (!isMatch) {
+                        console.log('Password mismatch');
+                        return null;
+                    }
 
-                return {
-                    id: user._id.toString(),
-                    name: user.name,
-                    email: user.email,
-                    image: user.image,
-                    role: user.role
-                };
+                    return {
+                        id: user._id.toString(),
+                        name: user.name,
+                        email: user.email,
+                        image: user.image,
+                        role: user.role
+                    };
+                } catch (error) {
+                    console.error('Auth error:', error);
+                    return null;
+                }
             }
         })
     ],
@@ -83,5 +105,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     session: {
         strategy: 'jwt',
     },
-    secret: process.env.NEXTAUTH_SECRET
+    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
 });
