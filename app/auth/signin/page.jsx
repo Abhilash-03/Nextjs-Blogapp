@@ -26,7 +26,7 @@ const SignInPage = () => {
             console.log('Sign in response:', res);
 
             if(res?.ok && !res?.error) {
-                router.push('/dashboard/profile');
+                window.location.href = '/dashboard/profile';
             } else {
                 // Auth.js v5 may return error in different formats
                 const errorMessage = res?.error === 'CredentialsSignin' 
