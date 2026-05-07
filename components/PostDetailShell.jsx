@@ -9,6 +9,7 @@ import ShareButton from "@/components/ShareButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import TableOfContents, { addHeadingIds, SidebarTableOfContents } from "@/components/TableOfContents";
 import { postsApi } from '@/lib/api';
+import useViewedPostsStore from '@/store/useViewedPostsStore';
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
 
@@ -36,26 +37,28 @@ const PostDetailShell = ({ post }) => {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [views, setViews] = useState(post.views || 0);
   
+  // Zustand store for viewed posts
+  const { hasViewed, markAsViewed } = useViewedPostsStore();
+  
   // Process content to add IDs to headings for TOC
   const processedContent = useMemo(() => addHeadingIds(post.content), [post.content]);
 
   // Track view on mount
   useEffect(() => {
     const trackView = async () => {
-      const viewedPosts = JSON.parse(sessionStorage.getItem('viewedPosts') || '[]');
-      if (viewedPosts.includes(post.slug)) return;
+      if (hasViewed(post.slug)) return;
 
       try {
         const data = await postsApi.incrementViews(post.slug);
         setViews(data.views);
-        sessionStorage.setItem('viewedPosts', JSON.stringify([...viewedPosts, post.slug]));
+        markAsViewed(post.slug);
       } catch (error) {
         console.error('Failed to track view:', error);
       }
     };
 
     trackView();
-  }, [post.slug]);
+  }, [post.slug, hasViewed, markAsViewed]);
 
   // Track scroll position to show/hide back to top button
   useEffect(() => {
