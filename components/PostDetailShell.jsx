@@ -8,6 +8,7 @@ import CommentSection from "@/components/comments/CommentSection";
 import ShareButton from "@/components/ShareButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import TableOfContents, { addHeadingIds, SidebarTableOfContents } from "@/components/TableOfContents";
+import { postsApi } from '@/lib/api';
 
 const fallbackImage = 'https://thumbs.dreamstime.com/b/blogging-blog-concepts-ideas-worktable-blogging-blog-concepts-ideas-white-worktable-110423482.jpg';
 
@@ -45,12 +46,9 @@ const PostDetailShell = ({ post }) => {
       if (viewedPosts.includes(post.slug)) return;
 
       try {
-        const res = await fetch(`/api/posts/${post.slug}/views`, { method: 'POST' });
-        if (res.ok) {
-          const data = await res.json();
-          setViews(data.views);
-          sessionStorage.setItem('viewedPosts', JSON.stringify([...viewedPosts, post.slug]));
-        }
+        const data = await postsApi.incrementViews(post.slug);
+        setViews(data.views);
+        sessionStorage.setItem('viewedPosts', JSON.stringify([...viewedPosts, post.slug]));
       } catch (error) {
         console.error('Failed to track view:', error);
       }

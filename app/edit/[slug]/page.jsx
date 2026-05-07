@@ -1,25 +1,24 @@
 'use client';
 
 import BlogEditor from '@/components/BlogEditor'
-import { notFound, useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-// import React, { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation';
+import { usePost } from '@/lib/hooks';
 
 const UpdatePostPage = () => {
-  const { slug }  = useParams();
-  const [editPost, setEditPost] = useState(null);
-  useEffect(() => {
-    fetch(`/api/posts/singlepost/${slug}`, { method: 'GET'})
-    .then((res) => res.json())
-    .then((data) => setEditPost(data))
-    .catch((err) => console.log('Client Error while fetching Post'));
-  }, [])
-   
-  //  console.log(slug);
-  //  console.log(editPost);
+  const { slug } = useParams();
+  const { data: editPost, isLoading } = usePost(slug);
+
+  if (isLoading) {
+    return (
+      <div className="max-w-[80%] mx-auto w-full mt-10 flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
   return (
     <div className='max-w-[80%] mx-auto w-full mt-10'>
-      <BlogEditor editPost = {editPost} />
+      <BlogEditor editPost={editPost} />
     </div>
   )
 }

@@ -2,32 +2,14 @@
 
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import CommentForm from "./CommentForm";
 import CommentItem from "./CommentItem";
 import { motion, AnimatePresence } from "motion/react";
+import { useComments } from '@/lib/hooks';
 
 const CommentSection = ({ postId }) => {
   const { data: session } = useSession();
-  const [comments, setComments] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchComments = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/comments?postId=${postId}`);
-      const data = await res.json();
-      setComments(data);
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchComments();
-  }, [postId]);
+  const { data: comments = [], isLoading: loading, refetch } = useComments(postId);
 
   const totalComments = comments.reduce((acc, comment) => {
     return acc + 1 + (comment.replies?.length || 0);
@@ -72,7 +54,7 @@ const CommentSection = ({ postId }) => {
         >
           <CommentForm
             postId={postId}
-            onSuccess={(newComment) => setComments([newComment, ...comments])}
+            onSuccess={() => refetch()}
           />
         </motion.div>
       )}

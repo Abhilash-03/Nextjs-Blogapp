@@ -1,43 +1,27 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { motion } from 'motion/react';
+import { useAdminPosts, useDeletePost } from '@/lib/hooks';
 
 const AdminPosts = () => {
-  const [posts, setPosts] = useState([]);
-  const [deleteId, setDeleteId] = useState(null);
+  const { data, isLoading } = useAdminPosts();
+  const deletePostMutation = useDeletePost();
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, postId: null, postTitle: '' });
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('table'); // 'table' or 'grid'
+  const [viewMode, setViewMode] = useState('table');
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const res = await fetch(`/api/admin/posts`);
-        const data = await res.json();
-        setPosts(data.posts || []);
-      } catch (error) {
-        console.error('Failed to fetch posts:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, []);
+  const posts = data?.posts || [];
 
   const handleDelete = async (id) => {
-    setDeleteId(id);
-    const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-
-    if (res.ok) {
-      setPosts(posts.filter((post) => post._id !== id));
-    }
-    setDeleteId(null);
-    setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
+    deletePostMutation.mutate(id, {
+      onSuccess: () => {
+        setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
+      },
+    });
   };
 
   const openDeleteModal = (postId, postTitle) => {
@@ -53,7 +37,7 @@ const AdminPosts = () => {
     post.author?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
@@ -335,7 +319,7 @@ const AdminPosts = () => {
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
-        loading={deleteId === confirmModal.postId}
+        loading={deletePostMutation.isPending}
       />
     </div>
   );

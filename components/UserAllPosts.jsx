@@ -2,47 +2,35 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import { useUserPosts, useDeletePost } from '@/lib/hooks';
 
 const UserAllPosts = () => {
   const { data: session, status } = useSession();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [deleteId, setDeleteId] = useState(null);
-  const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
-  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'oldest', 'title'
-  const [filterBy, setFilterBy] = useState('all'); // 'all', 'published', 'drafts'
+  const { data: postsData, isLoading: loading } = useUserPosts(session?.user?.id);
+  const deletePostMutation = useDeletePost();
+  const [viewMode, setViewMode] = useState('list');
+  const [sortBy, setSortBy] = useState('newest');
+  const [filterBy, setFilterBy] = useState('all');
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, postId: null, postTitle: '' });
   const router = useRouter();
 
-  useEffect(() => {
-    if (status === 'unauthenticated') router.push('/auth/signin');
+  const posts = postsData || [];
 
-    if (session?.user?.id) {
-      fetch(`/api/posts/user/${session.user.id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setPosts(data);
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    }
-  }, [session, status, router]);
+  if (status === 'unauthenticated') {
+    router.push('/auth/signin');
+    return null;
+  }
 
   const handleDelete = async (id) => {
-    setDeleteId(id);
-    try {
-      await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-      setPosts(posts.filter((post) => post._id !== id));
-    } catch (error) {
-      console.log("Delete Post Error ", error.message);
-    } finally {
-      setDeleteId(null);
-      setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
-    }
+    deletePostMutation.mutate(id, {
+      onSuccess: () => {
+        setConfirmModal({ isOpen: false, postId: null, postTitle: '' });
+      },
+    });
   };
 
   const openDeleteModal = (postId, postTitle) => {
@@ -485,7 +473,7 @@ const UserAllPosts = () => {
         confirmText="Delete"
         cancelText="Cancel"
         variant="danger"
-        loading={deleteId === confirmModal.postId}
+        loading={deletePostMutation.isPending}
       />
     </div>
   );

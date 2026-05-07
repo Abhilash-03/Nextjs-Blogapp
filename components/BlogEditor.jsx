@@ -6,6 +6,7 @@ import 'react-quill-new/dist/quill.snow.css';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import useDraftStore from '@/store/useDraftStore';
+import api from '@/lib/axios';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
@@ -113,30 +114,18 @@ const BlogEditor = ({ editPost }) => {
 
       const id = data.serverId || serverIdRef.current;
       const endpoint = id ? `/api/posts/${id}` : '/api/posts/new';
-      const method = id ? 'PATCH' : 'POST';
+      const method = id ? 'patch' : 'post';
 
       console.log('Making request to:', endpoint, 'Method:', method);
 
-      const res = await fetch(endpoint, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData),
-        credentials: 'include',
-      });
+      const res = await api[method](endpoint, postData);
 
-      console.log('Response status:', res.status);
-
-      if (res.ok) {
-        const responseData = await res.json();
-        console.log('Draft saved successfully:', responseData._id);
-        if (!serverIdRef.current && responseData._id) {
-          serverIdRef.current = responseData._id;
-          setDraftId(responseData._id);
-        }
-        return true;
+      console.log('Draft saved successfully:', res.data._id);
+      if (!serverIdRef.current && res.data._id) {
+        serverIdRef.current = res.data._id;
+        setDraftId(res.data._id);
       }
-      console.error('Server responded with error:', res.status);
-      return false;
+      return true;
     } catch (error) {
       console.error('Server sync failed:', error);
       return false;
@@ -315,14 +304,16 @@ const BlogEditor = ({ editPost }) => {
     const formData = new FormData();
     formData.append('image', file);
 
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData
-    });
-
-    const data = await res.json();
-    setImage(data.url);
-    setUploading(false);
+    try {
+      const res = await api.post('/api/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setImage(res.data.url);
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Submit handler
@@ -347,21 +338,18 @@ const BlogEditor = ({ editPost }) => {
 
     const postId = editPost?._id || serverIdRef.current;
     const endpoint = postId ? `/api/posts/${postId}` : '/api/posts/new';
-    const method = postId ? 'PATCH' : 'POST';
+    const method = postId ? 'patch' : 'post';
 
-    const res = await fetch(endpoint, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(postData),
-      credentials: 'include',
-    });
-
-    if (res.ok) {
+    try {
+      await api[method](endpoint, postData);
       clearDraft();
       router.push('/dashboard/allposts');
+    } catch (error) {
+      console.error('Submit failed:', error);
+    } finally {
+      setSubmitting(false);
+      setSavingDraft(false);
     }
-    setSubmitting(false);
-    setSavingDraft(false);
   };
 
   // Cancel handler
@@ -390,19 +378,15 @@ const BlogEditor = ({ editPost }) => {
     try {
       setUploadProgress('Uploading image...');
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
+      const res = await api.post('/api/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      if (!res.ok) throw new Error('Upload failed');
-
       setUploadProgress('Processing...');
-      const data = await res.json();
 
       const freshQuill = quillRef.current?.getEditor();
       if (freshQuill) {
-        freshQuill.insertEmbed(cursorPositionRef.current, 'image', data.url);
+        freshQuill.insertEmbed(cursorPositionRef.current, 'image', res.data.url);
         freshQuill.setSelection(cursorPositionRef.current + 1);
       }
 

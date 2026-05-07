@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'motion/react';
+import { bookmarksApi } from '@/lib/api';
 
 const BookmarkButton = ({ postId, size = 'default', showText = false }) => {
     const { data: session, status } = useSession();
@@ -23,13 +24,8 @@ const BookmarkButton = ({ postId, size = 'default', showText = false }) => {
     const checkBookmarkStatus = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch(`/api/bookmarks/${postId}`, {
-                cache: 'no-store'
-            });
-            if (res.ok) {
-                const data = await res.json();
-                setIsBookmarked(data.bookmarked);
-            }
+            const data = await bookmarksApi.check(postId);
+            setIsBookmarked(data.bookmarked);
         } catch (error) {
             console.error('Error checking bookmark status:', error);
         } finally {
@@ -50,25 +46,14 @@ const BookmarkButton = ({ postId, size = 'default', showText = false }) => {
 
         setIsLoading(true);
         try {
-            const res = await fetch(`/api/bookmarks/${postId}`, {
-                method: 'POST',
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                setIsBookmarked(data.bookmarked);
-                setToastMessage(data.message);
-                setShowToast(true);
-                setTimeout(() => setShowToast(false), 2000);
-            } else {
-                const data = await res.json();
-                setToastMessage(data.error || 'Failed to update bookmark');
-                setShowToast(true);
-                setTimeout(() => setShowToast(false), 2000);
-            }
+            const data = await bookmarksApi.add(postId);
+            setIsBookmarked(data.bookmarked);
+            setToastMessage(data.message);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 2000);
         } catch (error) {
             console.error('Error toggling bookmark:', error);
-            setToastMessage('Failed to update bookmark');
+            setToastMessage(error.response?.data?.error || 'Failed to update bookmark');
             setShowToast(true);
             setTimeout(() => setShowToast(false), 2000);
         } finally {

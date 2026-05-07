@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import api from '@/lib/axios';
 
 const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
     const [name, setName] = useState(user?.name || '');
@@ -31,19 +32,11 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
             const formData = new FormData();
             formData.append('image', file);
             
-            const res = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
+            const res = await api.post('/api/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
             
-            const data = await res.json();
-            
-            if (res.ok) {
-                setImage(data.url);
-            } else {
-                setError('Failed to upload image');
-                setPreviewImage(user?.image || '');
-            }
+            setImage(res.data.url);
         } catch (err) {
             console.error('Upload error:', err);
             setError('Failed to upload image');
@@ -65,23 +58,16 @@ const EditProfileModal = ({ isOpen, onClose, user, onUpdate }) => {
         setError('');
         
         try {
-            const res = await fetch('/api/user/profile', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: name.trim(), image: image || undefined })
+            const res = await api.patch('/api/user/profile', {
+                name: name.trim(),
+                image: image || undefined
             });
             
-            const data = await res.json();
-            
-            if (res.ok) {
-                onUpdate?.(data.user);
-                onClose();
-            } else {
-                setError(data.error || 'Failed to update profile');
-            }
+            onUpdate?.(res.data.user);
+            onClose();
         } catch (err) {
             console.error('Save error:', err);
-            setError('Failed to update profile');
+            setError(err.response?.data?.error || 'Failed to update profile');
         } finally {
             setIsSaving(false);
         }

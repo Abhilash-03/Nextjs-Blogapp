@@ -3,8 +3,9 @@ import AdminPosts from '@/components/admin/AdminPosts';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useAdminUsers, useDeleteUser, useAdminAnalytics } from '@/lib/hooks';
 
 // Icons
 const UsersIcon = () => (
@@ -165,34 +166,19 @@ function StatsCard({ title, value, icon, trend, trendUp }) {
 }
 
 function UsersTab() {
-  const [users, setUsers] = useState([]);
-  const [deleteId, setDeleteId] = useState(null);
+  const { data, isLoading } = useAdminUsers();
+  const deleteUserMutation = useDeleteUser();
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, userName: '' });
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch('/api/admin/users');
-        const data = await res.json();
-        setUsers(data.users || []);
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
+  const users = data?.users || [];
 
   const handleDelete = async (id) => {
-    setDeleteId(id);
-    const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
-    await res.json();
-    setUsers(users.filter(user => user._id !== id));
-    setDeleteId(null);
-    setConfirmModal({ isOpen: false, userId: null, userName: '' });
+    deleteUserMutation.mutate(id, {
+      onSuccess: () => {
+        setConfirmModal({ isOpen: false, userId: null, userName: '' });
+      },
+    });
   };
 
   const openDeleteModal = (userId, userName) => {
@@ -211,7 +197,7 @@ function UsersTab() {
   const adminCount = users.filter(u => u.role === 'admin').length;
   const userCount = users.filter(u => u.role !== 'admin').length;
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
@@ -332,7 +318,7 @@ function UsersTab() {
         confirmText="Delete User"
         cancelText="Cancel"
         variant="danger"
-        loading={deleteId === confirmModal.userId}
+        loading={deleteUserMutation.isPending}
       />
     </div>
   );
@@ -343,23 +329,7 @@ function PostsTab() {
 }
 
 function AnalyticsTab() {
-  const [analytics, setAnalytics] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const res = await fetch('/api/admin/analytics');
-        const data = await res.json();
-        setAnalytics(data);
-      } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAnalytics();
-  }, []);
+  const { data: analytics, isLoading } = useAdminAnalytics();
 
   const formatNumber = (num) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -378,7 +348,7 @@ function AnalyticsTab() {
     return `${days} day${days > 1 ? 's' : ''} ago`;
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>

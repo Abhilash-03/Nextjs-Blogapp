@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'motion/react';
+import { commentsApi } from '@/lib/api';
 
 const CommentForm = ({ postId, parentCommentId = null, onSuccess, isReply = false }) => {
   const { data: session } = useSession();
@@ -28,16 +29,10 @@ const CommentForm = ({ postId, parentCommentId = null, onSuccess, isReply = fals
 
     setSubmitting(true);
     try {
-      const res = await fetch('/api/comments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, parentCommentId, content: text })
-      });
-
-      const data = await res.json();
+      await commentsApi.create({ postId, parentCommentId, content: text });
       setText('');
       setIsFocused(false);
-      if (onSuccess) onSuccess(data);
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Failed to post comment:', error);
     } finally {

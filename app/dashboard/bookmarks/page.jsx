@@ -1,31 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import Sidebar from '@/components/Sidebar';
 import BlogCard from '@/components/BlogCard';
+import { useBookmarks } from '@/lib/hooks';
 
 const BookmarksPage = () => {
-  const [bookmarks, setBookmarks] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    fetchBookmarks();
-  }, []);
-
-  const fetchBookmarks = async () => {
-    try {
-      const res = await fetch('/api/bookmarks');
-      if (res.ok) {
-        const data = await res.json();
-        setBookmarks(data.bookmarks || []);
-      }
-    } catch (error) {
-      console.error('Error fetching bookmarks:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { data, isLoading } = useBookmarks();
+  const bookmarks = data?.bookmarks || [];
 
   return (
     <div className="min-h-screen bg-background">

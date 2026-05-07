@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ThumbsDown } from "../animate-ui/icons/thumbs-down";
 import { AnimateIcon } from "../animate-ui/icons/icon";
 import { ThumbsUp } from "../animate-ui/icons/thumbs-up";
+import { commentsApi } from '@/lib/api';
 
 // Helper function for relative time
 const getRelativeTime = (dateString) => {
@@ -93,11 +94,7 @@ const CommentItem = ({ comment, postId, depth = 0 }) => {
     }
 
     try {
-      await fetch(`/api/comments/${comment._id}/likeDislike`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action })
-      });
+      await commentsApi.likeDislike(comment._id, { action });
     } catch (error) {
       // Revert to previous state on error
       setLiked(prevLiked);

@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import BlogCard from './BlogCard';
 import SearchBar from './SearchBar';
 import TagFilter from './TagFilter';
+import { postsApi } from '@/lib/api';
 
 const BlogList = ({ initialPosts, allTags = [] }) => {
     const [posts, setPosts] = useState(initialPosts);
@@ -33,12 +34,8 @@ const BlogList = ({ initialPosts, allTags = [] }) => {
 
         setIsSearching(true);
         try {
-            const res = await fetch(`/api/posts/search?q=${encodeURIComponent(query)}`);
-            const data = await res.json();
-            
-            if (res.ok) {
-                setPosts(data.posts);
-            }
+            const data = await postsApi.search(query);
+            setPosts(data.posts || []);
         } catch (error) {
             console.error('Search error:', error);
         } finally {

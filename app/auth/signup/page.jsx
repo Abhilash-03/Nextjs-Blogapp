@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react"
+import api from '@/lib/axios';
 
 const SignUpPage = () => {
     const [form, setForm] = useState({
@@ -24,30 +25,30 @@ const SignUpPage = () => {
         formData.append('image', file);
         setUploading(true);
 
-        const res = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData
-        })
-
-        const data = await res.json();
-        setForm({...form, image: data.url });
-        setUploading(false);
+        try {
+            const res = await api.post('/api/upload', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            setForm({...form, image: res.data.url });
+        } catch (err) {
+            console.error('Upload error:', err);
+        } finally {
+            setUploading(false);
+        }
     }
 
     const handleSubmit = async(e) => {
         e.preventDefault();
         setLoading(true);
 
-        const res = await fetch('/api/signup', {
-            method: 'POST',
-            body: JSON.stringify(form),
-            headers: { 'Content-Type': 'application/json'}
-        })
-        const data = await res.json();
-        setLoading(false);
-
-        if(!res.ok) return setError(data.message);
-        router.push('/auth/signin');
+        try {
+            await api.post('/api/signup', form);
+            router.push('/auth/signin');
+        } catch (err) {
+            setError(err.response?.data?.message || 'Signup failed');
+        } finally {
+            setLoading(false);
+        }
     }
 
   return (
