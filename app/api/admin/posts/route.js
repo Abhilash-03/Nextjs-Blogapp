@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 export const GET = async() => {
     try {
         await connectToDB();
-        const posts = await Post.find().populate('author', 'name');
+        const posts = await Post.find().populate('author', 'name image').sort({ createdAt: -1 });
         return NextResponse.json({ posts });
     } catch (error) {
         console.log("Error fetching admin Posts", error.message);
