@@ -3,7 +3,7 @@ import AdminPosts from '@/components/admin/AdminPosts';
 import ConfirmModal from '@/components/ui/ConfirmModal';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAdminUsers, useDeleteUser, useAdminAnalytics } from '@/lib/hooks';
 
